@@ -2,8 +2,10 @@
 
 const FILM_COUNT = 5;
 const FILM_COUNT_ADDITION = 2;
-const mainContainer = document.querySelector(`.main`);
-const addituinContainerTitles = [`Top rated`, `Most commented`];
+const mainContainerElement = document.querySelector(`.main`);
+const headerElement = document.querySelector(`.header`);
+const footerElement = document.querySelector(`.footer`);
+const additionContainerTitles = [`Top rated`, `Most commented`];
 
 const createProfileTemplate = () => {
   return `<section class="header__profile profile">
@@ -248,29 +250,29 @@ const render = (container, template, position) => {
   container.insertAdjacentHTML(position, template);
 };
 
-render(document.querySelector(`.header`), createProfileTemplate(), `beforeend`);
-render(mainContainer, createNavigationTemplate(), `afterbegin`);
-render(mainContainer, createContentBlockTemplate(), `beforeend`);
+render(headerElement, createProfileTemplate(), `beforeend`);
+render(mainContainerElement, createNavigationTemplate(), `afterbegin`);
+render(mainContainerElement, createContentBlockTemplate(), `beforeend`);
 
-const filmContainer = mainContainer.querySelector(`.films`);
-const filmListContainer = mainContainer.querySelector(`.films-list__container`);
+const filmContainerElement = mainContainerElement.querySelector(`.films`);
+const filmListContainerElement = mainContainerElement.querySelector(`.films-list__container`);
 
 for (let i = 0; i < FILM_COUNT; i++) {
-  render(filmListContainer, createFilmCardTemplate(), `beforeend`);
+  render(filmListContainerElement, createFilmCardTemplate(), `beforeend`);
 }
 
-render(filmListContainer, createShowMoreTemplate(), `afterend`);
+render(filmListContainerElement, createShowMoreTemplate(), `afterend`);
 
 for (let i = 0; i < FILM_COUNT_ADDITION; i++) {
-  render(filmContainer, createBlockAdditionTemplate(), `beforeend`);
-  const extraContainers = filmContainer.querySelectorAll(`.films-list--extra`);
-  const additionContainer = extraContainers[extraContainers.length - 1];
-  additionContainer.querySelector(`.films-list__title`).textContent = addituinContainerTitles[i];
+  render(filmContainerElement, createBlockAdditionTemplate(), `beforeend`);
+  const extraContainerElements = filmContainerElement.querySelectorAll(`.films-list--extra`);
+  const additionContainerElement = extraContainerElements[extraContainerElements.length - 1];
+  additionContainerElement.querySelector(`.films-list__title`).textContent = additionContainerTitles[i];
 
   for (let j = 0; j < FILM_COUNT_ADDITION; j++) {
-    render(additionContainer.querySelector(`.films-list__container`), createFilmCardTemplate(), `beforeend`);
+    render(additionContainerElement.querySelector(`.films-list__container`), createFilmCardTemplate(), `beforeend`);
   }
 }
 
-render(document.querySelector(`.footer`), createFilmDetailsTemplate(), `afterend`);
+render(footerElement, createFilmDetailsTemplate(), `afterend`);
 document.querySelector(`.film-details`).classList.add(`visually-hidden`);
