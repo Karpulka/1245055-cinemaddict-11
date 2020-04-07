@@ -1,5 +1,3 @@
-'use strict';
-
 const FILM_COUNT = 5;
 const FILM_COUNT_ADDITION = 2;
 const mainContainerElement = document.querySelector(`.main`);
