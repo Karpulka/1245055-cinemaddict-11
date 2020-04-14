@@ -5,6 +5,7 @@ import {createContentBlockTemplate} from "./components/content-block";
 import {createFilmDetailsTemplate} from "./components/film-details";
 import {createBlockAdditionTemplate} from "./components/addition-block";
 import {createShowMoreTemplate} from "./components/show-more-button";
+import {generateFilms} from "./mock/film";
 
 const FILM_COUNT = 5;
 const FILM_COUNT_ADDITION = 2;
@@ -23,6 +24,8 @@ render(mainContainerElement, createContentBlockTemplate(), `beforeend`);
 
 const filmContainerElement = mainContainerElement.querySelector(`.films`);
 const filmListContainerElement = mainContainerElement.querySelector(`.films-list__container`);
+const films = generateFilms(FILM_COUNT);
+console.log(films);
 
 for (let i = 0; i < FILM_COUNT; i++) {
   render(filmListContainerElement, createFilmCardTemplate(), `beforeend`);
