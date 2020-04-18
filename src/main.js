@@ -80,6 +80,7 @@ if (films.length > 0) {
   }
 
   render(footerElement, createFilmDetailsTemplate(films[0]), `afterend`);
+  footerElement.querySelector(`.footer__statistics`).textContent = `${films.length} movies inside`;
   document.querySelector(`.film-details`).classList.add(`visually-hidden`);
 
   const showMoreButton = filmContainerElement.querySelector(`.films-list__show-more`);
