@@ -52,7 +52,7 @@ if (films.length > 0) {
     }
   }
 
-  render(footerElement, createFilmDetailsTemplate(), `afterend`);
+  render(footerElement, createFilmDetailsTemplate(films[0]), `afterend`);
   document.querySelector(`.film-details`).classList.add(`visually-hidden`);
 
   const showMoreButton = filmContainerElement.querySelector(`.films-list__show-more`);

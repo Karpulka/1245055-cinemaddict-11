@@ -12,6 +12,60 @@ const FILM_POSTERS = [
   `./images/posters/the-great-flamarion.jpg`,
   `./images/posters/the-man-with-the-golden-arm.jpg`
 ];
+const NAMES = [`Anthony`, `Anne`, `Heinz`, `Richard`, `Erich`, `Mary Beth`, `Dan`];
+const LASTNAMES = [`Mann`, `Wigton`, `Herald`, `Weil`, `von Stroheim`, `Hughes`, `Duryea`];
+const COUNTRIES = [`USA`, `Russia`, `France`, `UK`, `Italy`];
+const AGES = [0, 6, 12, 16, 18];
+const MONTHS = [
+  {
+    name: `January`,
+    dayCount: 31
+  },
+  {
+    name: `February`,
+    dayCount: 28
+  },
+  {
+    name: `March`,
+    dayCount: 31
+  },
+  {
+    name: `April`,
+    dayCount: 30
+  },
+  {
+    name: `May`,
+    dayCount: 31
+  },
+  {
+    name: `June`,
+    dayCount: 30
+  },
+  {
+    name: `July`,
+    dayCount: 31
+  },
+  {
+    name: `August`,
+    dayCount: 31
+  },
+  {
+    name: `September`,
+    dayCount: 30
+  },
+  {
+    name: `October`,
+    dayCount: 31
+  },
+  {
+    name: `November`,
+    dayCount: 30
+  },
+  {
+    name: `December`,
+    dayCount: 31
+  }
+];
 
 const generateText = function (text = TEXT) {
   const sentences = text.split(`.`);
@@ -47,25 +101,65 @@ const generateComments = () => {
   return result;
 };
 
+const generateNames = (count = 1) => {
+  const names = [];
+  for (let i = 0; i < count; i++) {
+    names.push(`${getRandomItemFromArray(NAMES)} ${getRandomItemFromArray(LASTNAMES)}`);
+  }
+  return names.join(`, `);
+};
+
 const createFilm = (key) => {
   const years = [2000];
   for (let i = 0; i < 20; i++) {
     years.push(years[years.length - 1] + 1);
   }
+  const year = getRandomItemFromArray(years);
 
   const hour = getRandomNumber(1, 3);
   const minute = getRandomNumber(1, 59);
   const countGenres = getRandomNumber(1, GENRES.length);
+  const duration = `${hour}h ${minute}m`;
+  const month = getRandomItemFromArray(MONTHS);
+  const name = `Film ${key || `Film Film`}`;
 
   return {
-    name: `Film ${key || `Film Film`}`,
+    name,
+    originalName: `Original: ${name}`,
     rating: getRandomNumber(0, 10),
-    year: getRandomItemFromArray(years),
-    duration: `${hour}h ${minute}m`,
-    genres: GENRES.slice(countGenres).join(`,`),
+    year,
+    duration,
+    genres: GENRES.slice(countGenres).join(`, `),
     description: generateText(),
     comments: generateComments(),
-    poster: getRandomItemFromArray(FILM_POSTERS)
+    poster: getRandomItemFromArray(FILM_POSTERS),
+    age: getRandomItemFromArray(AGES),
+    details: [
+      {
+        term: `Director`,
+        info: generateNames()
+      },
+      {
+        term: `Writers`,
+        info: generateNames(3)
+      },
+      {
+        term: `Actors`,
+        info: generateNames(4)
+      },
+      {
+        term: `Release Date`,
+        info: `${getRandomNumber(1, month.dayCount)} ${month.name} ${year}`
+      },
+      {
+        term: `Runtime`,
+        info: duration
+      },
+      {
+        term: `Country`,
+        info: getRandomItemFromArray(COUNTRIES)
+      },
+    ]
   };
 };
 
