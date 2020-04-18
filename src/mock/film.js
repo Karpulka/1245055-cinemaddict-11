@@ -134,6 +134,9 @@ const createFilm = (key) => {
     comments: generateComments(),
     poster: getRandomItemFromArray(FILM_POSTERS),
     age: getRandomItemFromArray(AGES),
+    isWatchlist: Math.random() > 0.5,
+    isWatched: Math.random() > 0.5,
+    isFavorites: Math.random() > 0.5,
     details: [
       {
         term: `Director`,
