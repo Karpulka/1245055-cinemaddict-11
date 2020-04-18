@@ -3,6 +3,15 @@ import {getRandomNumber, getRandomItemFromArray} from "../util";
 const GENRES = [`action`, `adventure`, `comedy`, `crime & gangster`, `drama`, `horror`];
 const TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`;
 const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
+const FILM_POSTERS = [
+  `./images/posters/made-for-each-other.png`,
+  `./images/posters/made-for-each-other.png`,
+  `./images/posters/sagebrush-trail.jpg`,
+  `./images/posters/santa-claus-conquers-the-martians.jpg`,
+  `./images/posters/the-dance-of-life.jpg`,
+  `./images/posters/the-great-flamarion.jpg`,
+  `./images/posters/the-man-with-the-golden-arm.jpg`
+];
 
 const generateText = function (text = TEXT) {
   const sentences = text.split(`.`);
@@ -13,7 +22,7 @@ const generateText = function (text = TEXT) {
     resultSentences.push(getRandomItemFromArray(sentences).trim());
   }
 
-  return resultSentences.join(`. `);
+  return `${resultSentences.join(`. `)}.`;
 };
 
 const getCommentDate = () => {
@@ -41,7 +50,7 @@ const generateComments = () => {
 const createFilm = (key) => {
   const years = [2000];
   for (let i = 0; i < 20; i++) {
-      years.push(years[years.length - 1] + 1);
+    years.push(years[years.length - 1] + 1);
   }
 
   const hour = getRandomNumber(1, 3);
@@ -55,8 +64,9 @@ const createFilm = (key) => {
     duration: `${hour}h ${minute}m`,
     genres: GENRES.slice(countGenres).join(`,`),
     description: generateText(),
-    comments: generateComments()
-  }
+    comments: generateComments(),
+    poster: getRandomItemFromArray(FILM_POSTERS)
+  };
 };
 
 const generateFilms = (count) => {
