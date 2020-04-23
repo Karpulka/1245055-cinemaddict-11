@@ -1,7 +1,8 @@
 const renderFilters = (filters) => {
   return filters
-    .map((elm) => {
-      return `<a href="${elm.link}" class="main-navigation__item">${elm.name}${elm.count ? ` <span class="main-navigation__item-count">${elm.count}</span>` : ``}</a>`;
+    .map((filter) => {
+      const {link, name, count} = filter;
+      return `<a href="${link}" class="main-navigation__item">${name}${count ? ` <span class="main-navigation__item-count">${count}</span>` : ``}</a>`;
     }).join(`\n`);
 };
 

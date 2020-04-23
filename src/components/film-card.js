@@ -1,14 +1,14 @@
 const DEFAULT_LENGTH = 140;
 
+const cutDescription = (text) => {
+  if (text.length > DEFAULT_LENGTH) {
+    text = `${text.slice(0, DEFAULT_LENGTH - 1)}...`;
+  }
+  return text;
+};
+
 export const createFilmCardTemplate = (film) => {
   const {name, rating, year, duration, genres, description, comments, poster} = film;
-
-  const cutDescription = (text, length = DEFAULT_LENGTH) => {
-    if (text.length > length) {
-      text = `${text.slice(0, length - 1)}...`;
-    }
-    return text;
-  };
 
   return `<article class="film-card">
             <h3 class="film-card__title">${name}</h3>

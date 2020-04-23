@@ -2,8 +2,8 @@ import {formatDateTime} from "../util";
 
 const renderFilmDetailsRow = (details) => {
   return details
-    .map((elm) => {
-      const {term, info} = elm;
+    .map((detail) => {
+      const {term, info} = detail;
       return `<tr class="film-details__row">
                 <td class="film-details__term">${term}</td>
                 <td class="film-details__cell">${info}</td>
@@ -15,21 +15,21 @@ const renderFilmDetailsRow = (details) => {
 const renderGenres = (genres) => {
   return genres
     .split(`, `)
-    .map((elm) => {
-      return `<span class="film-details__genre">${elm}</span>`;
+    .map((genre) => {
+      return `<span class="film-details__genre">${genre}</span>`;
     })
     .join(`\n`);
 };
 
 const renderComments = (comments) => {
-  const result = comments.map((elm) => {
-    const {comment, emotion, author, date} = elm;
+  const result = comments.map((comment) => {
+    const {comment: commentText, emotion, author, date} = comment;
     return `<li class="film-details__comment">
               <span class="film-details__comment-emoji">
                 <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
               </span>
               <div>
-                <p class="film-details__comment-text">${comment}</p>
+                <p class="film-details__comment-text">${commentText}</p>
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
                   <span class="film-details__comment-day">${formatDateTime(date)}</span>
