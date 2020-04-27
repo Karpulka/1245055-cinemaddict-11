@@ -27,7 +27,41 @@ const getNoFilmsText = () => {
 
 const renderFilm = (filmContainerElement, film) => {
   const filmElement = new FilmCard(film).getElement();
+  const filmElementPoster = filmElement.querySelector(`.film-card__poster`);
+  const filmElementTitle = filmElement.querySelector(`.film-card__title`);
+  const filmElementCommentsCount = filmElement.querySelector(`.film-card__comments`);
+
+  const filmDetails = new FilmDetails(film);
+  const filmDetailsElement = filmDetails.getElement();
+  const filmDetailselementClose = filmDetailsElement.querySelector(`.film-details__close-btn`);
+
+  const closeFilmDetails = () => {
+    footerElement.removeChild(filmDetailsElement);
+  };
+
+  const onFilmElementClick = () => {
+    footerElement.appendChild(filmDetailsElement);
+  };
+
+  const onCloseButtonClick = () => {
+    filmDetailselementClose.removeEventListener(`click`, onCloseButtonClick);
+    document.removeEventListener(`keydown`, onEscapeKeyPress);
+    closeFilmDetails();
+  };
+
+  const onEscapeKeyPress = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      closeFilmDetails();
+    }
+  };
+
   render(filmContainerElement, filmElement, POSITION.BEFOREEND);
+
+  filmElementPoster.addEventListener(`click`, onFilmElementClick);
+  filmElementTitle.addEventListener(`click`, onFilmElementClick);
+  filmElementCommentsCount.addEventListener(`click`, onFilmElementClick);
+  filmDetailselementClose.addEventListener(`click`, onCloseButtonClick);
+  document.addEventListener(`keydown`, onEscapeKeyPress);
 };
 
 const renderAdditionBlocks = (filmContainerElement, filmsSortByRating, filmsSortByCommentsCount) => {
@@ -76,9 +110,7 @@ if (films.length > 0) {
 
   render(filmListContainerElement, showMoreButtonElement, POSITION.AFTEREND);
   renderAdditionBlocks(filmContainerElement, filmsSortByRating, filmsSortByCommentsCount);
-  //render(footerElement, createFilmDetailsTemplate(films[0]), POSITION.AFTEREND);
   footerElement.querySelector(`.footer__statistics`).textContent = `${films.length} movies inside`;
-  // document.querySelector(`.film-details`).classList.add(`visually-hidden`);
 
   showMoreButtonElement.addEventListener(`click`, () => {
     const prevFilmsCount = showingFilmsCount;
