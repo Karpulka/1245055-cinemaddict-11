@@ -22,4 +22,10 @@ const formatDateTime = (date) => {
   return `${year}/${month}/${day} ${hours}:${minutes}`;
 };
 
-export {getRandomNumber, getRandomItemFromArray, formatDateTime};
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};
+
+export {getRandomNumber, getRandomItemFromArray, formatDateTime, createElement};
