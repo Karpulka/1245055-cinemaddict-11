@@ -1,3 +1,5 @@
+import {createElement} from "../util";
+
 const renderFilters = (filters) => {
   return filters
     .map((filter) => {
@@ -6,7 +8,7 @@ const renderFilters = (filters) => {
     }).join(`\n`);
 };
 
-export const createNavigationTemplate = (filters) => {
+const createNavigationTemplate = (filters) => {
   return `<nav class="main-navigation">
             <div class="main-navigation__items">
               ${renderFilters(filters)}
@@ -20,3 +22,26 @@ export const createNavigationTemplate = (filters) => {
             <li><a href="#" class="sort__button">Sort by rating</a></li>
           </ul>`;
 };
+
+export default class Navigation {
+  constructor(filters) {
+    this._filters = filters;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createNavigationTemplate(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

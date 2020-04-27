@@ -1,4 +1,4 @@
-import {formatDateTime} from "../util";
+import {formatDateTime, createElement} from "../util";
 
 const renderFilmDetailsRow = (details) => {
   return details
@@ -41,7 +41,7 @@ const renderComments = (comments) => {
   return `<ul class="film-details__comments-list">${result}</ul>`;
 };
 
-export const createFilmDetailsTemplate = (film) => {
+const createFilmDetailsTemplate = (film) => {
   const {name, originalName, rating, genres, description, comments, poster, age, details} = film;
 
   return `<section class="film-details">
@@ -135,3 +135,26 @@ export const createFilmDetailsTemplate = (film) => {
             </form>
           </section>`;
 };
+
+export default class FilmDetails {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmDetailsTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
