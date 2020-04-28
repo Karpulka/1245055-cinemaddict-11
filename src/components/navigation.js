@@ -4,7 +4,7 @@ const renderFilters = (filters) => {
   return filters
     .map((filter) => {
       const {link, name, count} = filter;
-      return `<a href="${link}" class="main-navigation__item">${name}${count !== undefined ? ` <span class="main-navigation__item-count">${count}</span>` : ``}</a>`;
+      return `<a href="${link}" class="main-navigation__item">${name}${count > -1 ? ` <span class="main-navigation__item-count">${count}</span>` : ``}</a>`;
     }).join(`\n`);
 };
 
