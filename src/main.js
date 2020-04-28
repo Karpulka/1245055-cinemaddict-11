@@ -5,11 +5,12 @@ import ContentBlock from "./components/content-block";
 import FilmDetails from "./components/film-details";
 import AdditionBlock from "./components/addition-block";
 import MoreButton from "./components/show-more-button";
+import Sort from "./components/sort";
 import {generateFilms} from "./mock/film";
 import {generateFilters} from "./mock/filter";
 import {render, POSITION, sortByDesc, createElement} from "./util";
 
-const FILM_COUNT = 20;
+const FILM_COUNT = 22;
 const FILM_PAGE_COUNT = 5;
 const FILM_COUNT_ADDITION = 2;
 const mainContainerElement = document.querySelector(`.main`);
@@ -22,7 +23,7 @@ const films = generateFilms(FILM_COUNT);
 const filters = generateFilters(films);
 
 const getNoFilmsText = () => {
-  return `<p>${NO_FILMS_TEXT}</p>`;
+  return `<h2 class="films-list__title">${NO_FILMS_TEXT}</h2>`;
 };
 
 const renderFilm = (filmContainerElement, film) => {
@@ -87,6 +88,7 @@ const renderAdditionBlocks = (filmContainerElement, filmsSortByRating, filmsSort
 
 render(headerElement, new Profile().getElement(), POSITION.BEFOREEND);
 render(mainContainerElement, new Navigation(filters).getElement(), POSITION.AFTERBEGIN);
+render(mainContainerElement, new Sort().getElement(), POSITION.BEFOREEND);
 render(mainContainerElement, new ContentBlock().getElement(), POSITION.BEFOREEND);
 
 const filmContainerElement = mainContainerElement.querySelector(`.films`);
@@ -110,7 +112,6 @@ if (films.length > 0) {
 
   render(filmListContainerElement, showMoreButtonElement, POSITION.AFTEREND);
   renderAdditionBlocks(filmContainerElement, filmsSortByRating, filmsSortByCommentsCount);
-  footerElement.querySelector(`.footer__statistics`).textContent = `${films.length} movies inside`;
 
   showMoreButtonElement.addEventListener(`click`, () => {
     const prevFilmsCount = showingFilmsCount;
@@ -126,5 +127,8 @@ if (films.length > 0) {
     }
   });
 } else {
-  render(filmListContainerElement, createElement(getNoFilmsText()), POSITION.BEFOREEND);
+  filmListContainerElement.remove();
+  render(filmContainerElement.querySelector(`.films-list`), createElement(getNoFilmsText()), POSITION.BEFOREEND);
 }
+
+footerElement.querySelector(`.footer__statistics`).textContent = `${films.length} movies inside`;
