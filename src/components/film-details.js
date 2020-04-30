@@ -1,4 +1,5 @@
-import {formatDateTime, createElement} from "../util";
+import {formatDateTime} from "../utils/common";
+import AbstractComponent from "./abstract-component";
 
 const renderFilmDetailsRow = (details) => {
   return details
@@ -136,25 +137,21 @@ const createFilmDetailsTemplate = (film) => {
           </section>`;
 };
 
-export default class FilmDetails {
+export default class FilmDetails extends AbstractComponent {
   constructor(film) {
+    super();
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmDetailsTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  setCloseClickHandler(handler) {
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
   }
 
-  removeElement() {
-    this._element = null;
+  removeCloseClickHandler(handler) {
+    this.getElement().querySelector(`.film-details__close-btn`).removeEventListener(`click`, handler);
   }
 }

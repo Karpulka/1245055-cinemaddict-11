@@ -1,4 +1,4 @@
-import {createElement} from "../util";
+import AbstractComponent from "./abstract-component";
 
 const createContentBlockTemplate = () => {
   return `<section class="films">
@@ -9,23 +9,8 @@ const createContentBlockTemplate = () => {
           </section>`;
 };
 
-export default class ContentBlock {
-  constructor() {
-    this._element = null;
-  }
-
+export default class ContentBlock extends AbstractComponent {
   getTemplate() {
     return createContentBlockTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

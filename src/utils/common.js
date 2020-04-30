@@ -1,9 +1,3 @@
-const POSITION = {
-  AFTERBEGIN: `afterbegin`,
-  AFTEREND: `afterend`,
-  BEFOREEND: `beforeend`
-};
-
 const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 };
@@ -28,28 +22,8 @@ const formatDateTime = (date) => {
   return `${year}/${month}/${day} ${hours}:${minutes}`;
 };
 
-const createElement = (template) => {
-  const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
-  return newElement.firstChild;
-};
-
-const render = (container, element, position) => {
-  switch (position) {
-    case POSITION.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case POSITION.AFTEREND:
-      container.after(element);
-      break;
-    case POSITION.BEFOREEND:
-      container.append(element);
-      break;
-  }
-};
-
 const sortByDesc = (a, b) => {
   return b - a;
 };
 
-export {getRandomNumber, getRandomItemFromArray, formatDateTime, createElement, render, POSITION, sortByDesc};
+export {getRandomNumber, getRandomItemFromArray, formatDateTime, sortByDesc};
