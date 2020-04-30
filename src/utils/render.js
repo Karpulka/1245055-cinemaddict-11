@@ -42,6 +42,6 @@ const toggleElement = (container, component, action) => {
       }
       break;
   }
-}
+};
 
 export {createElement, render, POSITION, remove, toggleElement};
