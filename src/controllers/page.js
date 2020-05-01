@@ -53,17 +53,15 @@ const renderAdditionBlocks = (filmContainerElement, filmsSortByRating, filmsSort
     const extraContainerElements = filmContainerElement.querySelectorAll(`.films-list--extra`);
     const additionContainerElement = extraContainerElements[extraContainerElements.length - 1];
     const films = ADDITION_CONTAINER_TITLES[i] === `Top rated` ? filmsSortByRating : filmsSortByCommentsCount;
+    const additionContainerElementTitle = additionContainerElement.querySelector(`.films-list__title`);
+    const additionContainerElementFilmList = additionContainerElement.querySelector(`.films-list__container`);
 
     if (ADDITION_CONTAINER_TITLES[i] === `Top rated` && films[0].rating > 0) {
-      additionContainerElement.querySelector(`.films-list__title`).textContent = ADDITION_CONTAINER_TITLES[i];
-      films.forEach((film) => {
-        renderFilm(additionContainerElement.querySelector(`.films-list__container`), film, POSITION.BEFOREEND);
-      });
+      additionContainerElementTitle.textContent = ADDITION_CONTAINER_TITLES[i];
+      renderFilms(additionContainerElementFilmList, films);
     } else if (ADDITION_CONTAINER_TITLES[i] === `Most commented` && films[0].comments.length > 0) {
-      additionContainerElement.querySelector(`.films-list__title`).textContent = ADDITION_CONTAINER_TITLES[i];
-      films.forEach((film) => {
-        renderFilm(additionContainerElement.querySelector(`.films-list__container`), film, POSITION.BEFOREEND);
-      });
+      additionContainerElementTitle.textContent = ADDITION_CONTAINER_TITLES[i];
+      renderFilms(additionContainerElementFilmList, films);
     }
   }
 };
