@@ -81,9 +81,14 @@ export default class PageController {
     this._contentBlock = new ContentBlock();
     this._moreButton = new MoreButton();
     this._noFilm = new NoFilm();
+    this._showingFilmsCount = FILM_PAGE_COUNT;
+    this._renderLoadMoreButton = this._renderLoadMoreButton.bind(this);
+    this._films = [];
+    this._renderSortFilms = this._renderSortFilms.bind(this);
   }
 
   render(films) {
+    this._films = films;
     render(this._container, this._navigation, POSITION.AFTERBEGIN);
     render(this._container, this._sort, POSITION.BEFOREEND);
     render(this._container, this._contentBlock, POSITION.BEFOREEND);
@@ -91,41 +96,44 @@ export default class PageController {
     const filmContainerElement = this._container.querySelector(`.films`);
     const filmListContainerElement = this._container.querySelector(`.films-list__container`);
 
-    const filmsSortByRating = getFilmsSortByRating(films, 0, FILM_COUNT_ADDITION);
-    const filmsSortByCommentsCount = getFilmsSortByCommentsCount(films, 0, FILM_COUNT_ADDITION);
+    const filmsSortByRating = getFilmsSortByRating(this._films, 0, FILM_COUNT_ADDITION);
+    const filmsSortByCommentsCount = getFilmsSortByCommentsCount(this._films, 0, FILM_COUNT_ADDITION);
 
-    const renderLoadMoreButton = (showingFilmsCount) => {
-      render(filmListContainerElement, this._moreButton, POSITION.AFTEREND);
-      this._moreButton.setClickHandler(() => {
-        const prevFilmsCount = showingFilmsCount;
-        showingFilmsCount = showingFilmsCount + FILM_PAGE_COUNT;
-
-        const sortedFilms = getSortedFilms(films, this._sort.getCurrentSortType(), prevFilmsCount, showingFilmsCount);
-        renderFilms(filmListContainerElement, sortedFilms);
-
-        if (showingFilmsCount >= films.length) {
-          remove(this._moreButton);
-        }
-      });
-    };
-
-    let showingFilmsCount = FILM_PAGE_COUNT;
-
-    if (films.length > 0) {
-      renderFilms(filmListContainerElement, getSortedFilms(films, this._sort.getCurrentSortType(), 0, showingFilmsCount));
-      renderLoadMoreButton(showingFilmsCount);
+    if (this._films.length > 0) {
+      renderFilms(filmListContainerElement, getSortedFilms(this._films, this._sort.getCurrentSortType(), 0, this._showingFilmsCount));
+      this._renderLoadMoreButton();
       renderAdditionBlocks(filmContainerElement, filmsSortByRating, filmsSortByCommentsCount);
-
-      this._sort.setSortTypeChangeHandler((sortType) => {
-        showingFilmsCount = FILM_PAGE_COUNT;
-        filmListContainerElement.innerHTML = ``;
-        remove(this._moreButton);
-        renderFilms(filmListContainerElement, getSortedFilms(films, sortType, 0, showingFilmsCount));
-        renderLoadMoreButton(showingFilmsCount);
-      });
+      this._renderSortFilms();
     } else {
       filmListContainerElement.remove();
       render(filmContainerElement.querySelector(`.films-list`), this._noFilm, POSITION.BEFOREEND);
     }
+  }
+
+  _renderLoadMoreButton() {
+    const filmListContainerElement = this._container.querySelector(`.films-list__container`);
+    render(filmListContainerElement, this._moreButton, POSITION.AFTEREND);
+    this._moreButton.setClickHandler(() => {
+      const prevFilmsCount = this._showingFilmsCount;
+      this._showingFilmsCount = this._showingFilmsCount + FILM_PAGE_COUNT;
+
+      const sortedFilms = getSortedFilms(this._films, this._sort.getCurrentSortType(), prevFilmsCount, this._showingFilmsCount);
+      renderFilms(filmListContainerElement, sortedFilms);
+
+      if (this._showingFilmsCount >= this._films.length) {
+        remove(this._moreButton);
+      }
+    });
+  };
+
+  _renderSortFilms() {
+    this._sort.setSortTypeChangeHandler((sortType) => {
+      const filmListContainerElement = this._container.querySelector(`.films-list__container`);
+      this._showingFilmsCount = FILM_PAGE_COUNT;
+      filmListContainerElement.innerHTML = ``;
+      remove(this._moreButton);
+      renderFilms(filmListContainerElement, getSortedFilms(this._films, sortType, 0, this._showingFilmsCount));
+      this._renderLoadMoreButton();
+    });
   }
 }
