@@ -1,10 +1,11 @@
 import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
-import {POSITION, render, toggleElement} from "../utils/render";
+import {POSITION, render, toggleElement, replace} from "../utils/render";
 
 export default class MovieController {
-  constructor(container) {
+  constructor(container, onDataChange) {
     this._container = container;
+    this._onDataChange = onDataChange;
     this._filmComponent = null;
     this._filmDetailsComponent = null;
     this._footerElement = document.querySelector(`.footer`);
@@ -13,20 +14,54 @@ export default class MovieController {
     this._onFilmElementClick = this._onFilmElementClick.bind(this);
     this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
     this._onEscapeKeyPress = this._onEscapeKeyPress.bind(this);
+    this._setAddToWatchlist = this._setAddToWatchlist.bind(this);
+    this._setMarkAsWatched = this._setMarkAsWatched.bind(this);
+    this._setMarkAsFavorite = this._setMarkAsFavorite.bind(this);
+    this._film = null;
   }
 
   render(film) {
+    this._film = film;
+
+    const oldFilmComponent = this._filmComponent;
+    const oldFilmDetailsComponent = this._filmDetailsComponent;
+
     this._filmComponent = new FilmCard(film);
     this._filmDetailsComponent = new FilmDetails(film);
 
-    render(this._container, this._filmComponent, POSITION.BEFOREEND);
+    this._filmComponent.setAddToWatchlistButtonClickHandler(this._setAddToWatchlist);
+    this._filmComponent.setMarkAsWatchedButtonClickHandler(this._setMarkAsWatched);
+    this._filmComponent.setMarkAsFavoriteButtonClickHandler(this._setMarkAsFavorite);
+
+    if (oldFilmComponent && oldFilmDetailsComponent) {
+      replace(oldFilmComponent, this._filmComponent);
+      replace(oldFilmDetailsComponent, this._filmDetailsComponent);
+    } else {
+      render(this._container, this._filmComponent, POSITION.BEFOREEND);
+    }
     this._setMovieHandlers();
   }
 
+  _setAddToWatchlist() {
+    this._onDataChange(this, this._film, Object.assign({}, this._film, {
+      isWatchlist: !this._film.isWatchlist
+    }));
+  }
+
+  _setMarkAsWatched() {
+    this._onDataChange(this, this._film, Object.assign({}, this._film, {
+      isWatched: !this._film.isWatched
+    }));
+  }
+
+  _setMarkAsFavorite() {
+    this._onDataChange(this, this._film, Object.assign({}, this._film, {
+      isFavorites: !this._film.isFavorites
+    }));
+  }
+
   _setMovieHandlers() {
-    this._filmComponent.setSelectorClickHandler(`.film-card__poster`, this._onFilmElementClick);
-    this._filmComponent.setSelectorClickHandler(`.film-card__title`, this._onFilmElementClick);
-    this._filmComponent.setSelectorClickHandler(`.film-card__comments`, this._onFilmElementClick);
+    this._filmComponent.setOpenCardClickHandler(this._onFilmElementClick);
     this._filmDetailsComponent.setCloseClickHandler(this._onCloseButtonClick);
   }
 

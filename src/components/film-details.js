@@ -43,7 +43,7 @@ const renderComments = (comments) => {
 };
 
 const createFilmDetailsTemplate = (film) => {
-  const {name, originalName, rating, genres, description, comments, poster, age, details} = film;
+  const {name, originalName, rating, genres, description, comments, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -85,13 +85,13 @@ const createFilmDetailsTemplate = (film) => {
                 </div>
           
                 <section class="film-details__controls">
-                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isWatchlist ? `checked` : ``}>
                   <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
           
-                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${isWatched ? `checked` : ``}>
                   <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
           
-                  <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+                  <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${isFavorites ? `checked` : ``}>
                   <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
                 </section>
               </div>
