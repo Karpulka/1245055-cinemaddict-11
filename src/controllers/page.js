@@ -8,44 +8,11 @@ import NoFilm from "../components/no-film";
 import Navigation from "../components/navigation";
 import Sort, {SORT_TYPE} from "../components/sort";
 import ContentBlock from "../components/content-block";
+import MovieController from "./movie";
 
 const FILM_COUNT_ADDITION = 2;
 const FILM_PAGE_COUNT = 5;
 const ADDITION_CONTAINER_TITLES = [`Top rated`, `Most commented`];
-
-const renderFilm = (filmContainerElement, film) => {
-  const filmComponent = new FilmCard(film);
-  const filmDetailsComponent = new FilmDetails(film);
-  const footerElement = document.querySelector(`.footer`);
-
-  const closeFilmDetails = () => {
-    toggleElement(footerElement, filmDetailsComponent, `hide`);
-    document.removeEventListener(`keydown`, onEscapeKeyPress);
-  };
-
-  const onFilmElementClick = () => {
-    toggleElement(footerElement, filmDetailsComponent, `show`);
-    document.addEventListener(`keydown`, onEscapeKeyPress);
-  };
-
-  const onCloseButtonClick = () => {
-    filmDetailsComponent.removeCloseClickHandler(onCloseButtonClick);
-    closeFilmDetails();
-  };
-
-  const onEscapeKeyPress = (evt) => {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
-      closeFilmDetails();
-    }
-  };
-
-  render(filmContainerElement, filmComponent, POSITION.BEFOREEND);
-
-  filmComponent.setSelectorClickHandler(`.film-card__poster`, onFilmElementClick);
-  filmComponent.setSelectorClickHandler(`.film-card__title`, onFilmElementClick);
-  filmComponent.setSelectorClickHandler(`.film-card__comments`, onFilmElementClick);
-  filmDetailsComponent.setCloseClickHandler(onCloseButtonClick);
-};
 
 const renderAdditionBlocks = (filmContainerElement, filmsSortByRating, filmsSortByCommentsCount) => {
   for (let i = 0; i < FILM_COUNT_ADDITION; i++) {
@@ -101,7 +68,8 @@ const getSortedFilms = (films, sortType, from, to) => {
 
 const renderFilms = (container, films) => {
   films.forEach((film) => {
-    renderFilm(container, film, POSITION.BEFOREEND);
+    const filmController = new MovieController(container);
+    filmController.render(film);
   });
 };
 
