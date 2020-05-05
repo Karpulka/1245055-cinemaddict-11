@@ -1,4 +1,4 @@
-import {POSITION, remove, render, replace} from "../utils/render";
+import {POSITION, remove, render} from "../utils/render";
 import AdditionBlock from "../components/addition-block";
 import {sortByDesc} from "../utils/common";
 import MoreButton from "../components/show-more-button";
@@ -133,7 +133,7 @@ export default class PageController {
         remove(this._moreButton);
       }
     });
-  };
+  }
 
   _renderSortFilms() {
     this._sort.setSortTypeChangeHandler((sortType) => {

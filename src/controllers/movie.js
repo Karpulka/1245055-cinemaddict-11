@@ -87,20 +87,20 @@ export default class MovieController {
     this._filmDetailsComponent.reset();
     toggleElement(this._footerElement, this._filmDetailsComponent, `hide`);
     document.removeEventListener(`keydown`, this._onEscapeKeyPress);
-  };
+  }
 
   _onFilmElementClick() {
     toggleElement(this._footerElement, this._filmDetailsComponent, `show`);
     document.addEventListener(`keydown`, this._onEscapeKeyPress);
-  };
+  }
 
   _onCloseButtonClick() {
     this._closeFilmDetails();
-  };
+  }
 
   _onEscapeKeyPress(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       this._closeFilmDetails();
     }
-  };
+  }
 }

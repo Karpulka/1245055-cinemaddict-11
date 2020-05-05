@@ -1,4 +1,4 @@
-import {formatDateTime, getRandomItemFromArray} from "../utils/common";
+import {formatDateTime} from "../utils/common";
 import AbstractSmartComponent from "./abstract-smart-component";
 
 const EMOJI_PATH = `./images/emoji/`;
