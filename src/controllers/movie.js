@@ -87,9 +87,11 @@ export default class MovieController {
     this._filmDetailsComponent.reset();
     toggleElement(this._footerElement, this._filmDetailsComponent, `hide`);
     document.removeEventListener(`keydown`, this._onEscapeKeyPress);
+    this._mode = Mode.DEFAULT;
   }
 
   _onFilmElementClick() {
+    this._mode = Mode.EDIT;
     toggleElement(this._footerElement, this._filmDetailsComponent, `show`);
     document.addEventListener(`keydown`, this._onEscapeKeyPress);
   }
