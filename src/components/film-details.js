@@ -1,5 +1,7 @@
 import {formatDateTime} from "../utils/common";
-import AbstractComponent from "./abstract-component";
+import AbstractSmartComponent from "./abstract-smart-component";
+
+const EMOJI_PATH = `./images/emoji/`;
 
 const renderFilmDetailsRow = (details) => {
   return details
@@ -43,7 +45,7 @@ const renderComments = (comments) => {
 };
 
 const createFilmDetailsTemplate = (film) => {
-  const {name, originalName, rating, genres, description, comments, poster, age, details} = film;
+  const {name, originalName, rating, genres, description, comments, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -85,13 +87,13 @@ const createFilmDetailsTemplate = (film) => {
                 </div>
           
                 <section class="film-details__controls">
-                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isWatchlist ? `checked` : ``}>
                   <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
           
-                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+                  <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${isWatched ? `checked` : ``}>
                   <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
           
-                  <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+                  <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${isFavorites ? `checked` : ``}>
                   <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
                 </section>
               </div>
@@ -137,10 +139,28 @@ const createFilmDetailsTemplate = (film) => {
           </section>`;
 };
 
-export default class FilmDetails extends AbstractComponent {
+export default class FilmDetails extends AbstractSmartComponent {
   constructor(film) {
     super();
     this._film = film;
+    this._closeClickHandler = null;
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  reset() {
+    const emoji = this.getElement().querySelector(`.film-details__new-comment .film-details__add-emoji-label img`);
+    const commentText = this.getElement().querySelector(`.film-details__comment-input`);
+    if (emoji) {
+      emoji.remove();
+    }
+    if (commentText) {
+      commentText.value = ``;
+    }
+
+    this.rerender();
   }
 
   getTemplate() {
@@ -149,9 +169,51 @@ export default class FilmDetails extends AbstractComponent {
 
   setCloseClickHandler(handler) {
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
+    this._closeClickHandler = handler;
   }
 
-  removeCloseClickHandler(handler) {
-    this.getElement().querySelector(`.film-details__close-btn`).removeEventListener(`click`, handler);
+  setFormElementsChangeHandler() {
+    this.getElement().querySelectorAll(`[name="comment-emoji"]`).forEach((emotion) => {
+      emotion.addEventListener(`change`, (evt) => {
+        if (evt.target.value) {
+          const forNewEmojiElement = this.getElement().querySelector(`.film-details__new-comment .film-details__add-emoji-label`);
+          if (!forNewEmojiElement.querySelector(`img`)) {
+            const newEmoji = document.createElement(`img`);
+            newEmoji.src = `${EMOJI_PATH}${evt.target.value}.png`;
+            newEmoji.alt = `emoji-${evt.target.value}`;
+            newEmoji.width = `55`;
+            newEmoji.height = `55`;
+            forNewEmojiElement.append(newEmoji);
+          } else {
+            forNewEmojiElement.querySelector(`img`).src = `${EMOJI_PATH}${evt.target.value}.png`;
+            forNewEmojiElement.querySelector(`img`).alt = `emoji-${evt.target.value}`;
+          }
+        }
+      });
+    });
+  }
+
+  setFormSubmitHandler() {
+    document.addEventListener(`keydown`, (evt) => {
+      if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
+        const commentText = this.getElement().querySelector(`.film-details__comment-input`).value;
+        const emoji = this.getElement().querySelector(`[name="comment-emoji"]:checked`);
+        if (commentText && emoji) {
+          this._film.comments.push({
+            comment: commentText,
+            emotion: emoji.value,
+            author: `Current Author`,
+            date: new Date()
+          });
+          this.rerender();
+        }
+      }
+    });
+  }
+
+  recoveryListeners() {
+    this.setCloseClickHandler(this._closeClickHandler);
+    this.setFormElementsChangeHandler();
+    this.setFormSubmitHandler();
   }
 }
