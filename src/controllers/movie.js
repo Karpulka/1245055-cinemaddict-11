@@ -63,6 +63,8 @@ export default class MovieController {
   _setMovieHandlers() {
     this._filmComponent.setOpenCardClickHandler(this._onFilmElementClick);
     this._filmDetailsComponent.setCloseClickHandler(this._onCloseButtonClick);
+    this._filmDetailsComponent.setFormElementsChangeHandler();
+    this._filmDetailsComponent.setFormSubmitHandler();
   }
 
   _closeFilmDetails() {
