@@ -150,6 +150,19 @@ export default class FilmDetails extends AbstractSmartComponent {
     super.rerender();
   }
 
+  reset() {
+    const emoji = this.getElement().querySelector(`.film-details__new-comment .film-details__add-emoji-label img`);
+    const commentText = this.getElement().querySelector(`.film-details__comment-input`);
+    if (emoji) {
+      emoji.remove();
+    }
+    if (commentText) {
+      commentText.value = ``;
+    }
+
+    this.rerender();
+  }
+
   getTemplate() {
     return createFilmDetailsTemplate(this._film);
   }
@@ -157,10 +170,6 @@ export default class FilmDetails extends AbstractSmartComponent {
   setCloseClickHandler(handler) {
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
     this._closeClickHandler = handler;
-  }
-
-  removeCloseClickHandler(handler) {
-    this.getElement().querySelector(`.film-details__close-btn`).removeEventListener(`click`, handler);
   }
 
   setFormElementsChangeHandler() {

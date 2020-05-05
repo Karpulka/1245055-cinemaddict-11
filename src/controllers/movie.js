@@ -2,10 +2,16 @@ import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace} from "../utils/render";
 
+const Mode = {
+  DEFAULT: `default`,
+  EDIT: `edit`,
+};
+
 export default class MovieController {
   constructor(container, onDataChange) {
     this._container = container;
     this._onDataChange = onDataChange;
+    this._mode = Mode.DEFAULT;
     this._filmComponent = null;
     this._filmDetailsComponent = null;
     this._footerElement = document.querySelector(`.footer`);
@@ -46,6 +52,12 @@ export default class MovieController {
     this._setMovieHandlers();
   }
 
+  setDefaultView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._closeFilmDetails();
+    }
+  }
+
   _setAddToWatchlist() {
     this._onDataChange(this._film, Object.assign({}, this._film, {
       isWatchlist: !this._film.isWatchlist
@@ -72,7 +84,7 @@ export default class MovieController {
   }
 
   _closeFilmDetails() {
-    this._filmDetailsComponent.removeCloseClickHandler(this._onCloseButtonClick);
+    this._filmDetailsComponent.reset();
     toggleElement(this._footerElement, this._filmDetailsComponent, `hide`);
     document.removeEventListener(`keydown`, this._onEscapeKeyPress);
   };

@@ -90,6 +90,7 @@ export default class PageController {
     this._onDataChange = this._onDataChange.bind(this);
     this._showingFilms = [];
     this._filmsInAdditionsBlocks = [];
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   render(films) {
@@ -161,5 +162,9 @@ export default class PageController {
     remove(this._navigation);
     this._navigation = new Navigation(generateFilters(this._films));
     render(this._container, this._navigation, POSITION.AFTERBEGIN);
+  }
+
+  _onViewChange() {
+    this._showingFilms.forEach((filmController) => filmController.setDefaultView());
   }
 }
