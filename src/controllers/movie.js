@@ -20,6 +20,10 @@ export default class MovieController {
     this._film = null;
   }
 
+  get film() {
+    return this._film;
+  }
+
   render(film) {
     this._film = film;
 
@@ -43,19 +47,19 @@ export default class MovieController {
   }
 
   _setAddToWatchlist() {
-    this._onDataChange(this, this._film, Object.assign({}, this._film, {
+    this._onDataChange(this._film, Object.assign({}, this._film, {
       isWatchlist: !this._film.isWatchlist
     }));
   }
 
   _setMarkAsWatched() {
-    this._onDataChange(this, this._film, Object.assign({}, this._film, {
+    this._onDataChange(this._film, Object.assign({}, this._film, {
       isWatched: !this._film.isWatched
     }));
   }
 
   _setMarkAsFavorite() {
-    this._onDataChange(this, this._film, Object.assign({}, this._film, {
+    this._onDataChange(this._film, Object.assign({}, this._film, {
       isFavorites: !this._film.isFavorites
     }));
   }
