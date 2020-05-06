@@ -9,7 +9,7 @@ const renderFilmDetailsRow = (details) => {
       const {term, info} = detail;
       return `<tr class="film-details__row">
                 <td class="film-details__term">${term}</td>
-                <td class="film-details__cell">${term  === `Runtime` ? formatFilmDuration(info) : info}</td>
+                <td class="film-details__cell">${term === `Runtime` ? formatFilmDuration(info) : info}</td>
               </tr>`;
     })
     .join(`\n`);
