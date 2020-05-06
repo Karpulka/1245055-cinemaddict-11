@@ -116,10 +116,8 @@ const createFilm = (key) => {
   }
   const year = getRandomItemFromArray(years);
 
-  const hour = getRandomNumber(1, 3);
-  const minute = getRandomNumber(1, 59);
   const countGenres = getRandomNumber(1, GENRES.length);
-  const duration = `${hour}h ${minute}m`;
+  const duration = getRandomNumber(90, 180);
   const month = getRandomItemFromArray(MONTHS);
   const name = `Film ${key || `Film Film`}`;
 

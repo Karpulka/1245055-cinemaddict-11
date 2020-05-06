@@ -1,4 +1,4 @@
-import {formatDateTime} from "../utils/common";
+import {formatDateTime, formatFilmDuration} from "../utils/common";
 import AbstractSmartComponent from "./abstract-smart-component";
 
 const EMOJI_PATH = `./images/emoji/`;
@@ -9,7 +9,7 @@ const renderFilmDetailsRow = (details) => {
       const {term, info} = detail;
       return `<tr class="film-details__row">
                 <td class="film-details__term">${term}</td>
-                <td class="film-details__cell">${info}</td>
+                <td class="film-details__cell">${term === `Runtime` ? formatFilmDuration(info) : info}</td>
               </tr>`;
     })
     .join(`\n`);
