@@ -1,3 +1,7 @@
+import moment from "moment";
+import momentDurationFormatSetup from "moment-duration-format";
+momentDurationFormatSetup(moment);
+
 const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 };
@@ -8,22 +12,16 @@ const getRandomItemFromArray = (array) => {
   return array[getRandomNumber(min, max)];
 };
 
-const castTimeFormat = (value) => {
-  return value < 10 ? `0${value}` : String(value);
+const formatDateTime = (date) => {
+  return moment(date).format(`YYYY/MM/DD hh:mm`);
 };
 
-const formatDateTime = (date) => {
-  const hours = castTimeFormat(date.getHours() % 12);
-  const minutes = castTimeFormat(date.getMinutes());
-  const year = date.getFullYear();
-  const month = castTimeFormat(date.getMonth() + 1);
-  const day = castTimeFormat(date.getDate());
-
-  return `${year}/${month}/${day} ${hours}:${minutes}`;
+const formatFilmDuration = (movieDuration) => {
+  return moment.duration(movieDuration, `minutes`).format(`h[h] m[m]`);
 };
 
 const sortByDesc = (a, b) => {
   return b - a;
 };
 
-export {getRandomNumber, getRandomItemFromArray, formatDateTime, sortByDesc};
+export {getRandomNumber, getRandomItemFromArray, formatDateTime, sortByDesc, formatFilmDuration};

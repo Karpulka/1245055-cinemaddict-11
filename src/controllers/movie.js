@@ -1,6 +1,7 @@
 import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace} from "../utils/render";
+import {formatFilmDuration} from "../utils/common";
 
 const Mode = {
   DEFAULT: `default`,

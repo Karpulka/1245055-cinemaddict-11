@@ -1,4 +1,5 @@
 import AbstractComponent from "./abstract-component";
+import {formatFilmDuration} from "../utils/common";
 
 const DEFAULT_LENGTH = 140;
 
@@ -17,7 +18,7 @@ const createFilmCardTemplate = (film) => {
             <p class="film-card__rating">${rating}</p>
             <p class="film-card__info">
               <span class="film-card__year">${year}</span>
-              <span class="film-card__duration">${duration}</span>
+              <span class="film-card__duration">${formatFilmDuration(duration)}</span>
               <span class="film-card__genre">${genres}</span>
             </p>
             <img src="${poster}" alt="" class="film-card__poster">
