@@ -76,7 +76,7 @@ const renderFilms = (container, films, onDataChange) => {
 };
 
 export default class PageController {
-  constructor(container, filters) {
+  constructor(container, filters, moviesModel) {
     this._container = container;
     this._navigation = new Navigation(filters);
     this._sort = new Sort();
@@ -85,7 +85,8 @@ export default class PageController {
     this._noFilm = new NoFilm();
     this._showingFilmsCount = FILM_PAGE_COUNT;
     this._renderLoadMoreButton = this._renderLoadMoreButton.bind(this);
-    this._films = [];
+    this._moviesModel = moviesModel;
+    this._films = this._moviesModel.getAllFilms();
     this._renderSortFilms = this._renderSortFilms.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
     this._showingFilms = [];
@@ -93,8 +94,7 @@ export default class PageController {
     this._onViewChange = this._onViewChange.bind(this);
   }
 
-  render(films) {
-    this._films = films;
+  render() {
     render(this._container, this._navigation, POSITION.AFTERBEGIN);
     render(this._container, this._sort, POSITION.BEFOREEND);
     render(this._container, this._contentBlock, POSITION.BEFOREEND);
