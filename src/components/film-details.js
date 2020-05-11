@@ -44,8 +44,8 @@ const renderComments = (comments) => {
   return `<ul class="film-details__comments-list">${result}</ul>`;
 };
 
-const createFilmDetailsTemplate = (film) => {
-  const {name, originalName, rating, genres, description, comments, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
+const createFilmDetailsTemplate = (film, comments) => {
+  const {name, originalName, rating, genres, description, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -140,9 +140,10 @@ const createFilmDetailsTemplate = (film) => {
 };
 
 export default class FilmDetails extends AbstractSmartComponent {
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._film = film;
+    this._comments = comments;
     this._closeClickHandler = null;
   }
 
@@ -164,7 +165,7 @@ export default class FilmDetails extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film);
+    return createFilmDetailsTemplate(this._film, this._comments);
   }
 
   setCloseClickHandler(handler) {
@@ -193,20 +194,10 @@ export default class FilmDetails extends AbstractSmartComponent {
     });
   }
 
-  setFormSubmitHandler() {
+  setFormSubmitHandler(handler) {
     document.addEventListener(`keydown`, (evt) => {
       if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
-        const commentText = this.getElement().querySelector(`.film-details__comment-input`).value;
-        const emoji = this.getElement().querySelector(`[name="comment-emoji"]:checked`);
-        if (commentText && emoji) {
-          this._film.comments.push({
-            comment: commentText,
-            emotion: emoji.value,
-            author: `Current Author`,
-            date: new Date()
-          });
-          this.rerender();
-        }
+        handler();
       }
     });
   }

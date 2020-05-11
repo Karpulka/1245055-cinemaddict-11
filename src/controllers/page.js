@@ -76,7 +76,7 @@ const renderFilms = (container, films, onDataChange) => {
 };
 
 export default class PageController {
-  constructor(container, filters, moviesModel) {
+  constructor(container, filters, moviesModel, commentsModel) {
     this._container = container;
     this._navigation = new Navigation(filters);
     this._sort = new Sort();
@@ -149,14 +149,9 @@ export default class PageController {
   }
 
   _onDataChange(oldData, newData) {
-    const index = this._films.findIndex((film) => film === oldData);
-
-    if (index === -1) {
-      return;
-    }
+    this._moviesModel.updateData(oldData.id, newData);
 
     const filmControllers = this._showingFilms.filter((filmController) => filmController.film === oldData);
-    this._films[index] = newData;
 
     filmControllers.forEach((filmController) => filmController.render(newData));
     remove(this._navigation);

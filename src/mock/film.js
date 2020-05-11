@@ -85,20 +85,26 @@ const getCommentDate = () => {
   return currentDate;
 };
 
+export let getAllComments = [];
+
 const generateComments = () => {
-  const result = [];
+  const resultID = [];
+  const resultComments = [];
   const commentsCount = getRandomNumber(0, 5);
 
   for (let i = 0; i < commentsCount; i++) {
-    result.push({
+    const id = getRandomNumber(1, 10000) + i;
+    resultComments.push({
+      id,
       comment: generateText(),
       emotion: getRandomItemFromArray(EMOTIONS),
       author: `Author Name ${i}`,
       date: getCommentDate()
     });
+    resultID.push(id);
   }
-
-  return result;
+  getAllComments = getAllComments.concat(resultComments);
+  return resultID;
 };
 
 const generateNames = (count = 1) => {
@@ -122,6 +128,7 @@ const createFilm = (key) => {
   const name = `Film ${key || `Film Film`}`;
 
   return {
+    id: Date.now() + getRandomNumber(1, 10000),
     name,
     originalName: `Original: ${name}`,
     rating: getRandomNumber(0, 10),

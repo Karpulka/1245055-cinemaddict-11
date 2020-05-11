@@ -1,10 +1,16 @@
 import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace} from "../utils/render";
+import Comments from "../models/comments";
+import {getAllComments} from "../mock/film";
 
 const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
+};
+
+const getRandomNumber = (min, max) => {
+  return Math.floor(Math.random() * (max - min)) + min;
 };
 
 export default class MovieController {
@@ -24,6 +30,9 @@ export default class MovieController {
     this._setMarkAsWatched = this._setMarkAsWatched.bind(this);
     this._setMarkAsFavorite = this._setMarkAsFavorite.bind(this);
     this._film = null;
+    this._filmComments = [];
+    this._filmCommentsModel = new Comments(getAllComments);
+    this._onSubmitForm = this._onSubmitForm.bind(this);
   }
 
   get film() {
@@ -32,12 +41,13 @@ export default class MovieController {
 
   render(film) {
     this._film = film;
+    this._filmComments = this._filmCommentsModel.getComments(this._film.comments);
 
     const oldFilmComponent = this._filmComponent;
     const oldFilmDetailsComponent = this._filmDetailsComponent;
 
-    this._filmComponent = new FilmCard(film);
-    this._filmDetailsComponent = new FilmDetails(film);
+    this._filmComponent = new FilmCard(film, this._filmComments);
+    this._filmDetailsComponent = new FilmDetails(film, this._filmComments);
 
     this._filmComponent.setAddToWatchlistButtonClickHandler(this._setAddToWatchlist);
     this._filmComponent.setMarkAsWatchedButtonClickHandler(this._setMarkAsWatched);
@@ -80,7 +90,29 @@ export default class MovieController {
     this._filmComponent.setOpenCardClickHandler(this._onFilmElementClick);
     this._filmDetailsComponent.setCloseClickHandler(this._onCloseButtonClick);
     this._filmDetailsComponent.setFormElementsChangeHandler();
-    this._filmDetailsComponent.setFormSubmitHandler();
+    this._filmDetailsComponent.setFormSubmitHandler(this._onSubmitForm);
+  }
+
+  _onSubmitForm() {
+    const commentText = this._filmDetailsComponent.getElement().querySelector(`.film-details__comment-input`).value;
+    const emoji = this._filmDetailsComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
+    if (commentText && emoji) {
+      const id = getRandomNumber(1, 1000) + getRandomNumber(1001, 10000);
+      const newComment = {
+        id,
+        comment: commentText,
+        emotion: emoji.value,
+        author: `Current Author`,
+        date: new Date()
+      };
+
+      const commentsIDs = this._film.comments.slice();
+      commentsIDs.push(id);
+      this._filmCommentsModel.addComment(newComment);
+      this._onDataChange(this._film, Object.assign({}, this._film, {comments: commentsIDs}));
+
+      this._filmDetailsComponent.rerender();
+    }
   }
 
   _closeFilmDetails() {

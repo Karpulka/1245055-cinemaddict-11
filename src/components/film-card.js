@@ -10,8 +10,8 @@ const cutDescription = (text) => {
   return text;
 };
 
-const createFilmCardTemplate = (film) => {
-  const {name, rating, year, duration, genres, description, comments, poster, isWatchlist, isWatched, isFavorites} = film;
+const createFilmCardTemplate = (film, comments) => {
+  const {name, rating, year, duration, genres, description, poster, isWatchlist, isWatched, isFavorites} = film;
 
   return `<article class="film-card">
             <h3 class="film-card__title">${name}</h3>
@@ -33,13 +33,14 @@ const createFilmCardTemplate = (film) => {
 };
 
 export default class FilmCard extends AbstractComponent {
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._film = film;
+    this._comments = comments;
   }
 
   getTemplate() {
-    return createFilmCardTemplate(this._film);
+    return createFilmCardTemplate(this._film, this._comments);
   }
 
   setOpenCardClickHandler(handler) {
