@@ -11,11 +11,10 @@ const headerElement = document.querySelector(`.header`);
 const footerElement = document.querySelector(`.footer`);
 
 const films = generateFilms(FILM_COUNT);
-const filters = generateFilters(films);
 const moviesModel = new Movies(films);
 
 render(headerElement, new Profile(), POSITION.BEFOREEND);
 
-new PageController(mainContainerElement, filters, moviesModel).render();
+new PageController(mainContainerElement, moviesModel).render();
 
 footerElement.querySelector(`.footer__statistics`).textContent = `${films.length} movies inside`;

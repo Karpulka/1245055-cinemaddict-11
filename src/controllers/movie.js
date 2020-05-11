@@ -1,6 +1,6 @@
 import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
-import {POSITION, render, toggleElement, replace} from "../utils/render";
+import {POSITION, render, toggleElement, replace, remove} from "../utils/render";
 import Comments from "../models/comments";
 import {getAllComments} from "../mock/film";
 
@@ -136,5 +136,11 @@ export default class MovieController {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       this._closeFilmDetails();
     }
+  }
+
+  destroy() {
+    remove(this._filmComponent);
+    remove(this._filmDetailsComponent);
+    document.removeEventListener(`keydown`, this._onEscapeKeyPress);
   }
 }
