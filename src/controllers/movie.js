@@ -3,11 +3,18 @@ import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace, remove} from "../utils/render";
 import Comments from "../models/comments";
 import {getAllComments} from "../mock/film";
+import {FilterTypes} from "./filter";
 
 const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
 };
+
+const FormFilterTypes = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`
+}
 
 const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -33,6 +40,7 @@ export default class MovieController {
     this._filmComments = [];
     this._filmCommentsModel = new Comments(getAllComments);
     this._onSubmitForm = this._onSubmitForm.bind(this);
+    this._onChangeFormFilterInput = this._onChangeFormFilterInput.bind(this);
   }
 
   get film() {
@@ -91,6 +99,7 @@ export default class MovieController {
     this._filmDetailsComponent.setCloseClickHandler(this._onCloseButtonClick);
     this._filmDetailsComponent.setFormElementsChangeHandler();
     this._filmDetailsComponent.setFormSubmitHandler(this._onSubmitForm);
+    this._filmDetailsComponent.setFormFilterInputChangeHandler(this._onChangeFormFilterInput);
   }
 
   _onSubmitForm() {
@@ -112,6 +121,20 @@ export default class MovieController {
       this._onDataChange(this._film, Object.assign({}, this._film, {comments: commentsIDs}));
 
       this._filmDetailsComponent.rerender();
+    }
+  }
+
+  _onChangeFormFilterInput(evt) {
+    switch (evt.target.name) {
+      case FormFilterTypes.WATCHLIST:
+        this._setAddToWatchlist();
+        break;
+      case FormFilterTypes.WATCHED:
+        this._setMarkAsWatched();
+        break;
+      case FormFilterTypes.FAVORITE:
+        this._setMarkAsFavorite();
+        break;
     }
   }
 

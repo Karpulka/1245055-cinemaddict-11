@@ -1,4 +1,6 @@
 import {FilterTypes} from "../controllers/filter";
+import {sortByDesc} from "../utils/common";
+import {SORT_TYPE} from "../components/sort";
 
 export default class Movies {
   constructor(films) {
@@ -33,6 +35,7 @@ export default class Movies {
     }
 
     this._films = [].concat(this._films.slice(0, index), newFilm, this._films.slice(index + +1));
+    this._callHandlers(this._dataChangeHandlers);
   }
 
   setFilter(filterType) {
@@ -51,4 +54,33 @@ export default class Movies {
   _callHandlers(handlers) {
     handlers.forEach((handler) => handler());
   }
+
+  _getFilmsSortByRating(from, to) {
+    return this.getFilms().slice().sort((a, b) => {
+      return sortByDesc(a.rating, b.rating);
+    }).slice(from, to);
+  };
+
+  _getFilmsSortByCommentsCount(from, to) {
+    return this.getFilms().slice().sort((a, b) => {
+      return sortByDesc(a.comments.length, b.comments.length);
+    }).slice(from, to);
+  };
+
+  getSortedFilms(sortType, from, to) {
+    switch (sortType) {
+      case SORT_TYPE.DATE:
+        return this.getFilms().slice().sort((a, b) => {
+          const bDate = new Date(b.details.find((detail) => detail.term === `Release Date`).info);
+          const aDate = new Date(a.details.find((detail) => detail.term === `Release Date`).info);
+          return bDate - aDate;
+        }).slice(from, to);
+      case SORT_TYPE.RATING:
+        return this._getFilmsSortByRating(from, to);
+        break;
+      case SORT_TYPE.DEFAULT:
+        return this.getFilms().slice(from, to);
+        break;
+    }
+  };
 }

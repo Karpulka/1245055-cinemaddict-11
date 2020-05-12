@@ -145,6 +145,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._film = film;
     this._comments = comments;
     this._closeClickHandler = null;
+    this._setFilterInputHandler = null;
   }
 
   rerender() {
@@ -194,6 +195,13 @@ export default class FilmDetails extends AbstractSmartComponent {
     });
   }
 
+  setFormFilterInputChangeHandler(handler) {
+    this.getElement().querySelector(`[name="watchlist"]`).addEventListener(`change`, handler);
+    this.getElement().querySelector(`[name="watched"]`).addEventListener(`change`, handler);
+    this.getElement().querySelector(`[name="favorite"]`).addEventListener(`change`, handler);
+    this._setFilterInputHandler = handler;
+  }
+
   setFormSubmitHandler(handler) {
     document.addEventListener(`keydown`, (evt) => {
       if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
@@ -206,5 +214,6 @@ export default class FilmDetails extends AbstractSmartComponent {
     this.setCloseClickHandler(this._closeClickHandler);
     this.setFormElementsChangeHandler();
     this.setFormSubmitHandler();
+    this.setFormFilterInputChangeHandler(this._setFilterInputHandler);
   }
 }
