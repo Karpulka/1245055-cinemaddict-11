@@ -1,5 +1,5 @@
 import {FilterTypes} from "../controllers/filter";
-import {sortByDesc} from "../utils/common";
+import {getFilmsSortByRating} from "../utils/film";
 import {SORT_TYPE} from "../components/sort";
 
 export default class Movies {
@@ -56,15 +56,7 @@ export default class Movies {
   }
 
   _getFilmsSortByRating(from, to) {
-    return this.getFilms().slice().sort((a, b) => {
-      return sortByDesc(a.rating, b.rating);
-    }).slice(from, to);
-  };
-
-  _getFilmsSortByCommentsCount(from, to) {
-    return this.getFilms().slice().sort((a, b) => {
-      return sortByDesc(a.comments.length, b.comments.length);
-    }).slice(from, to);
+    return getFilmsSortByRating(this.getFilms(), from, to);
   };
 
   getSortedFilms(sortType, from, to) {

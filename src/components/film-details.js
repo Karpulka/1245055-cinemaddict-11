@@ -1,5 +1,6 @@
 import {formatDateTime, formatFilmDuration} from "../utils/common";
 import AbstractSmartComponent from "./abstract-smart-component";
+import {encode} from "he";
 
 const EMOJI_PATH = `./images/emoji/`;
 
@@ -26,17 +27,17 @@ const renderGenres = (genres) => {
 
 const renderComments = (comments) => {
   const result = comments.map((comment) => {
-    const {comment: commentText, emotion, author, date} = comment;
+    const {comment: commentText, emotion, author, date, id} = comment;
     return `<li class="film-details__comment">
               <span class="film-details__comment-emoji">
                 <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
               </span>
               <div>
-                <p class="film-details__comment-text">${commentText}</p>
+                <p class="film-details__comment-text">${encode(commentText)}</p>
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
                   <span class="film-details__comment-day">${formatDateTime(date)}</span>
-                  <button class="film-details__comment-delete">Delete</button>
+                  <button class="film-details__comment-delete" data-id="${id}">Delete</button>
                 </p>
               </div>
             </li>`;
@@ -146,6 +147,9 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._comments = comments;
     this._closeClickHandler = null;
     this._setFilterInputHandler = null;
+    this._deleteButtonHandler = null;
+    this._formSubmitHandlers = null;
+    this._onKeyDown = this._onKeyDown.bind(this);
   }
 
   rerender() {
@@ -203,17 +207,29 @@ export default class FilmDetails extends AbstractSmartComponent {
   }
 
   setFormSubmitHandler(handler) {
-    document.addEventListener(`keydown`, (evt) => {
-      if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
-        handler();
-      }
+    document.addEventListener(`keydown`, this._onKeyDown.bind(null, handler));
+    this._formSubmitHandlers = handler;
+  }
+
+  _onKeyDown(handler, evt) {
+    if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
+      handler();
+      document.removeEventListener(`keydown`, this._onKeyDown);
+    }
+  }
+
+  setDeleteCommentButtonClickHandler(handler) {
+    this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((deleteButton) => {
+      deleteButton.addEventListener(`click`, handler);
     });
+    this._deleteButtonHandler = handler;
   }
 
   recoveryListeners() {
     this.setCloseClickHandler(this._closeClickHandler);
-    this.setFormElementsChangeHandler();
-    this.setFormSubmitHandler();
+    this.setFormElementsChangeHandler(this._formSubmitHandlers);
+    this.setFormSubmitHandler(this._formSubmitHandlers);
     this.setFormFilterInputChangeHandler(this._setFilterInputHandler);
+    this.setDeleteCommentButtonClickHandler(this._deleteButtonHandler);
   }
 }

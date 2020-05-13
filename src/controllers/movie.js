@@ -3,7 +3,6 @@ import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace, remove} from "../utils/render";
 import Comments from "../models/comments";
 import {getAllComments} from "../mock/film";
-import {FilterTypes} from "./filter";
 
 const Mode = {
   DEFAULT: `default`,
@@ -18,6 +17,14 @@ const FormFilterTypes = {
 
 const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
+};
+
+export const renderFilms = (container, films, onDataChange) => {
+  return films.map((film) => {
+    const filmController = new MovieController(container, onDataChange);
+    filmController.render(film);
+    return filmController;
+  });
 };
 
 export default class MovieController {
@@ -41,6 +48,7 @@ export default class MovieController {
     this._filmCommentsModel = new Comments(getAllComments);
     this._onSubmitForm = this._onSubmitForm.bind(this);
     this._onChangeFormFilterInput = this._onChangeFormFilterInput.bind(this);
+    this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
   }
 
   get film() {
@@ -100,11 +108,27 @@ export default class MovieController {
     this._filmDetailsComponent.setFormElementsChangeHandler();
     this._filmDetailsComponent.setFormSubmitHandler(this._onSubmitForm);
     this._filmDetailsComponent.setFormFilterInputChangeHandler(this._onChangeFormFilterInput);
+    this._filmDetailsComponent.setDeleteCommentButtonClickHandler(this._onDeleteButtonClick);
   }
 
   _onSubmitForm() {
-    const commentText = this._filmDetailsComponent.getElement().querySelector(`.film-details__comment-input`).value;
-    const emoji = this._filmDetailsComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
+    const filmDetailElement = this._filmDetailsComponent.getElement();
+    const commentText = filmDetailElement.querySelector(`.film-details__comment-input`).value;
+    const emoji = filmDetailElement.querySelector(`[name="comment-emoji"]:checked`);
+
+    const commentsIDs = this._film.comments.slice();
+
+    if (this._filmCommentsModel.getCommentsForDelete().length > 0) {
+      this._filmCommentsModel.deleteComments();
+
+      this._filmCommentsModel.getCommentsForDelete().forEach((commentId) => {
+        const commentIndex = commentsIDs.indexOf(commentId);
+        if (commentIndex > -1 ) {
+          commentsIDs.splice(commentIndex, 1);
+        }
+      });
+    }
+
     if (commentText && emoji) {
       const id = getRandomNumber(1, 1000) + getRandomNumber(1001, 10000);
       const newComment = {
@@ -114,14 +138,14 @@ export default class MovieController {
         author: `Current Author`,
         date: new Date()
       };
-
-      const commentsIDs = this._film.comments.slice();
-      commentsIDs.push(id);
+      console.log(id);
       this._filmCommentsModel.addComment(newComment);
-      this._onDataChange(this._film, Object.assign({}, this._film, {comments: commentsIDs}));
-
-      this._filmDetailsComponent.rerender();
+      commentsIDs.push(id);
     }
+
+    this._onDataChange(this._film, Object.assign({}, this._film, {comments: commentsIDs}));
+
+    this._filmDetailsComponent.rerender();
   }
 
   _onChangeFormFilterInput(evt) {
@@ -159,6 +183,15 @@ export default class MovieController {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       this._closeFilmDetails();
     }
+  }
+
+  _onDeleteButtonClick(evt) {
+    evt.preventDefault();
+
+    const id = evt.target.getAttribute(`data-id`);
+    this._filmCommentsModel.addCommentForDelete(id);
+    evt.target.closest(`.film-details__comment`).remove();
+    this._filmDetailsComponent.getElement().querySelector(`.film-details__comments-count`).textContent = this._filmDetailsComponent.getElement().querySelectorAll(`.film-details__comments-list > .film-details__comment`).length;
   }
 
   destroy() {
