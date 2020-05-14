@@ -18,8 +18,6 @@ export default class Movies {
 
   getFilms() {
     switch (this._currentFilterType) {
-      case FilterTypes.ALL:
-        return this._films;
       case FilterTypes.WATCHLIST:
         return this._films.filter((elm) => elm.isWatchlist);
       case FilterTypes.HISTORY:
@@ -38,7 +36,7 @@ export default class Movies {
       return;
     }
 
-    let isCommentsUpdate = !(this._films[index].comments === newFilm.comments);
+    const isCommentsUpdate = !(this._films[index].comments === newFilm.comments);
 
     this._films = [].concat(this._films.slice(0, index), newFilm, this._films.slice(index + +1));
     this._callHandlers(this._dataChangeHandlers);

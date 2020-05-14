@@ -85,26 +85,26 @@ const getCommentDate = () => {
   return currentDate;
 };
 
-export let getAllComments = [];
+export const getAllComments = [];
 
 const generateComments = () => {
-  const resultID = [];
-  const resultComments = [];
+  const ids = [];
   const commentsCount = getRandomNumber(0, 5);
 
   for (let i = 0; i < commentsCount; i++) {
     const id = getRandomNumber(1, 10000) + i;
-    resultComments.push({
+    const comment = {
       id,
       comment: generateText(),
       emotion: getRandomItemFromArray(EMOTIONS),
       author: `Author Name ${i}`,
       date: getCommentDate()
-    });
-    resultID.push(id);
+    };
+    getAllComments.push(comment);
+    ids.push(id);
   }
-  getAllComments = getAllComments.concat(resultComments);
-  return resultID;
+
+  return ids;
 };
 
 const generateNames = (count = 1) => {
