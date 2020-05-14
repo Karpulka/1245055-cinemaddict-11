@@ -11,7 +11,7 @@ const cutDescription = (text) => {
 };
 
 const createFilmCardTemplate = (film) => {
-  const {name, rating, year, duration, genres, description, comments, poster, isWatchlist, isWatched, isFavorites} = film;
+  const {name, rating, year, duration, genres, description, poster, isWatchlist, isWatched, isFavorites, comments} = film;
 
   return `<article class="film-card">
             <h3 class="film-card__title">${name}</h3>

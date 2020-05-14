@@ -1,14 +1,32 @@
 import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
-import {POSITION, render, toggleElement, replace} from "../utils/render";
+import {POSITION, render, toggleElement, replace, remove} from "../utils/render";
 
 const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
 };
 
+const FormFilterTypes = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`
+};
+
+const getRandomNumber = (min, max) => {
+  return Math.floor(Math.random() * (max - min)) + min;
+};
+
+export const renderFilms = (container, films, onDataChange, commentsModel) => {
+  return films.map((film) => {
+    const filmController = new MovieController(container, onDataChange, commentsModel);
+    filmController.render(film);
+    return filmController;
+  });
+};
+
 export default class MovieController {
-  constructor(container, onDataChange) {
+  constructor(container, onDataChange, commentsModel) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._mode = Mode.DEFAULT;
@@ -24,6 +42,10 @@ export default class MovieController {
     this._setMarkAsWatched = this._setMarkAsWatched.bind(this);
     this._setMarkAsFavorite = this._setMarkAsFavorite.bind(this);
     this._film = null;
+    this._filmCommentsModel = commentsModel;
+    this._onSubmitForm = this._onSubmitForm.bind(this);
+    this._onChangeFormFilterInput = this._onChangeFormFilterInput.bind(this);
+    this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
   }
 
   get film() {
@@ -37,7 +59,7 @@ export default class MovieController {
     const oldFilmDetailsComponent = this._filmDetailsComponent;
 
     this._filmComponent = new FilmCard(film);
-    this._filmDetailsComponent = new FilmDetails(film);
+    this._filmDetailsComponent = new FilmDetails(film, this._filmCommentsModel);
 
     this._filmComponent.setAddToWatchlistButtonClickHandler(this._setAddToWatchlist);
     this._filmComponent.setMarkAsWatchedButtonClickHandler(this._setMarkAsWatched);
@@ -80,7 +102,57 @@ export default class MovieController {
     this._filmComponent.setOpenCardClickHandler(this._onFilmElementClick);
     this._filmDetailsComponent.setCloseClickHandler(this._onCloseButtonClick);
     this._filmDetailsComponent.setFormElementsChangeHandler();
-    this._filmDetailsComponent.setFormSubmitHandler();
+    this._filmDetailsComponent.setFormFilterInputChangeHandler(this._onChangeFormFilterInput);
+    this._filmDetailsComponent.setDeleteCommentButtonClickHandler(this._onDeleteButtonClick);
+  }
+
+  _onSubmitForm() {
+    const filmDetailComponent = this._filmDetailsComponent;
+    const commentText = filmDetailComponent.getElement().querySelector(`.film-details__comment-input`).value;
+    const emoji = filmDetailComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
+
+    const commentsIDs = this._film.comments.slice();
+
+    if (this._filmCommentsModel.getCommentsForDelete().length > 0) {
+      this._filmCommentsModel.getCommentsForDelete().forEach((commentId) => {
+        const commentIndex = commentsIDs.indexOf(commentId);
+        if (commentIndex > -1) {
+          commentsIDs.splice(commentIndex, 1);
+        }
+      });
+      this._filmCommentsModel.deleteComments();
+    }
+
+    if (commentText && emoji) {
+      const id = getRandomNumber(1, 1000) + getRandomNumber(1001, 10000);
+      const newComment = {
+        id,
+        comment: commentText,
+        emotion: emoji.value,
+        author: `Current Author`,
+        date: new Date()
+      };
+
+      this._filmCommentsModel.addComment(newComment);
+      commentsIDs.push(id);
+    }
+    this._onDataChange(this._film, Object.assign({}, this._film, {comments: commentsIDs}));
+
+    this._filmDetailsComponent.rerender();
+  }
+
+  _onChangeFormFilterInput(evt) {
+    switch (evt.target.name) {
+      case FormFilterTypes.WATCHLIST:
+        this._setAddToWatchlist();
+        break;
+      case FormFilterTypes.WATCHED:
+        this._setMarkAsWatched();
+        break;
+      case FormFilterTypes.FAVORITE:
+        this._setMarkAsFavorite();
+        break;
+    }
   }
 
   _closeFilmDetails() {
@@ -103,6 +175,23 @@ export default class MovieController {
   _onEscapeKeyPress(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       this._closeFilmDetails();
+    } else if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
+      this._onSubmitForm();
     }
+  }
+
+  _onDeleteButtonClick(evt) {
+    evt.preventDefault();
+
+    const id = evt.target.getAttribute(`data-id`);
+    this._filmCommentsModel.addCommentForDelete(id);
+    evt.target.closest(`.film-details__comment`).remove();
+    this._filmDetailsComponent.getElement().querySelector(`.film-details__comments-count`).textContent = this._filmDetailsComponent.getElement().querySelectorAll(`.film-details__comments-list > .film-details__comment`).length;
+  }
+
+  destroy() {
+    remove(this._filmComponent);
+    remove(this._filmDetailsComponent);
+    document.removeEventListener(`keydown`, this._onEscapeKeyPress);
   }
 }
