@@ -1,6 +1,8 @@
+import {getAllComments} from "../mock/film";
+
 export default class Comments {
-  constructor(allComments) {
-    this._allComments = allComments;
+  constructor(comments) {
+    this._allComments = comments;
     this._commentForDeleteIds = [];
   }
 
@@ -11,7 +13,7 @@ export default class Comments {
   }
 
   addComment(comment) {
-    this._allComments.push(comment);
+    this._allComments = [].concat(this._allComments, comment);
   }
 
   deleteComments() {

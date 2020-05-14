@@ -141,15 +141,13 @@ const createFilmDetailsTemplate = (film, comments) => {
 };
 
 export default class FilmDetails extends AbstractSmartComponent {
-  constructor(film, comments) {
+  constructor(film, commentsModel) {
     super();
     this._film = film;
-    this._comments = comments;
+    this._commentsModel = commentsModel;
     this._closeClickHandler = null;
     this._setFilterInputHandler = null;
     this._deleteButtonHandler = null;
-    this._formSubmitHandlers = null;
-    this._onKeyDown = this._onKeyDown.bind(this);
   }
 
   rerender() {
@@ -170,7 +168,7 @@ export default class FilmDetails extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film, this._comments);
+    return createFilmDetailsTemplate(this._film, this._commentsModel.getComments(this._film.comments));
   }
 
   setCloseClickHandler(handler) {
@@ -206,18 +204,6 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._setFilterInputHandler = handler;
   }
 
-  setFormSubmitHandler(handler) {
-    document.addEventListener(`keydown`, this._onKeyDown.bind(null, handler));
-    this._formSubmitHandlers = handler;
-  }
-
-  _onKeyDown(handler, evt) {
-    if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
-      handler();
-      document.removeEventListener(`keydown`, this._onKeyDown);
-    }
-  }
-
   setDeleteCommentButtonClickHandler(handler) {
     this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((deleteButton) => {
       deleteButton.addEventListener(`click`, handler);
@@ -227,8 +213,7 @@ export default class FilmDetails extends AbstractSmartComponent {
 
   recoveryListeners() {
     this.setCloseClickHandler(this._closeClickHandler);
-    this.setFormElementsChangeHandler(this._formSubmitHandlers);
-    this.setFormSubmitHandler(this._formSubmitHandlers);
+    this.setFormElementsChangeHandler();
     this.setFormFilterInputChangeHandler(this._setFilterInputHandler);
     this.setDeleteCommentButtonClickHandler(this._deleteButtonHandler);
   }

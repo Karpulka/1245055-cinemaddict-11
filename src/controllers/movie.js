@@ -2,7 +2,6 @@ import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace, remove} from "../utils/render";
 import Comments from "../models/comments";
-import {getAllComments} from "../mock/film";
 
 const Mode = {
   DEFAULT: `default`,
@@ -19,16 +18,16 @@ const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 };
 
-export const renderFilms = (container, films, onDataChange) => {
+export const renderFilms = (container, films, onDataChange, commentsModel) => {
   return films.map((film) => {
-    const filmController = new MovieController(container, onDataChange);
+    const filmController = new MovieController(container, onDataChange, commentsModel);
     filmController.render(film);
     return filmController;
   });
 };
 
 export default class MovieController {
-  constructor(container, onDataChange) {
+  constructor(container, onDataChange, commentsModel) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._mode = Mode.DEFAULT;
@@ -44,8 +43,7 @@ export default class MovieController {
     this._setMarkAsWatched = this._setMarkAsWatched.bind(this);
     this._setMarkAsFavorite = this._setMarkAsFavorite.bind(this);
     this._film = null;
-    this._filmComments = [];
-    this._filmCommentsModel = new Comments(getAllComments);
+    this._filmCommentsModel = commentsModel;
     this._onSubmitForm = this._onSubmitForm.bind(this);
     this._onChangeFormFilterInput = this._onChangeFormFilterInput.bind(this);
     this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
@@ -57,13 +55,12 @@ export default class MovieController {
 
   render(film) {
     this._film = film;
-    this._filmComments = this._filmCommentsModel.getComments(this._film.comments);
 
     const oldFilmComponent = this._filmComponent;
     const oldFilmDetailsComponent = this._filmDetailsComponent;
 
-    this._filmComponent = new FilmCard(film, this._filmComments);
-    this._filmDetailsComponent = new FilmDetails(film, this._filmComments);
+    this._filmComponent = new FilmCard(film);
+    this._filmDetailsComponent = new FilmDetails(film, this._filmCommentsModel);
 
     this._filmComponent.setAddToWatchlistButtonClickHandler(this._setAddToWatchlist);
     this._filmComponent.setMarkAsWatchedButtonClickHandler(this._setMarkAsWatched);
@@ -106,27 +103,25 @@ export default class MovieController {
     this._filmComponent.setOpenCardClickHandler(this._onFilmElementClick);
     this._filmDetailsComponent.setCloseClickHandler(this._onCloseButtonClick);
     this._filmDetailsComponent.setFormElementsChangeHandler();
-    this._filmDetailsComponent.setFormSubmitHandler(this._onSubmitForm);
     this._filmDetailsComponent.setFormFilterInputChangeHandler(this._onChangeFormFilterInput);
     this._filmDetailsComponent.setDeleteCommentButtonClickHandler(this._onDeleteButtonClick);
   }
 
   _onSubmitForm() {
-    const filmDetailElement = this._filmDetailsComponent.getElement();
-    const commentText = filmDetailElement.querySelector(`.film-details__comment-input`).value;
-    const emoji = filmDetailElement.querySelector(`[name="comment-emoji"]:checked`);
+    const filmDetailComponent = this._filmDetailsComponent;
+    const commentText = filmDetailComponent.getElement().querySelector(`.film-details__comment-input`).value;
+    const emoji = filmDetailComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
 
     const commentsIDs = this._film.comments.slice();
 
     if (this._filmCommentsModel.getCommentsForDelete().length > 0) {
-      this._filmCommentsModel.deleteComments();
-
       this._filmCommentsModel.getCommentsForDelete().forEach((commentId) => {
         const commentIndex = commentsIDs.indexOf(commentId);
         if (commentIndex > -1 ) {
           commentsIDs.splice(commentIndex, 1);
         }
       });
+      this._filmCommentsModel.deleteComments();
     }
 
     if (commentText && emoji) {
@@ -138,11 +133,10 @@ export default class MovieController {
         author: `Current Author`,
         date: new Date()
       };
-      console.log(id);
+
       this._filmCommentsModel.addComment(newComment);
       commentsIDs.push(id);
     }
-
     this._onDataChange(this._film, Object.assign({}, this._film, {comments: commentsIDs}));
 
     this._filmDetailsComponent.rerender();
@@ -182,6 +176,8 @@ export default class MovieController {
   _onEscapeKeyPress(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       this._closeFilmDetails();
+    } else if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
+      this._onSubmitForm();
     }
   }
 

@@ -10,7 +10,7 @@ import AdditionBlockController from "./addition-block";
 const FILM_PAGE_COUNT = 5;
 
 export default class PageController {
-  constructor(container, moviesModel) {
+  constructor(container, moviesModel, commentsModel) {
     this._container = container;
     this._sort = new Sort();
     this._contentBlock = new ContentBlock();
@@ -19,6 +19,7 @@ export default class PageController {
     this._showingFilmsCount = FILM_PAGE_COUNT;
     this._renderLoadMoreButton = this._renderLoadMoreButton.bind(this);
     this._moviesModel = moviesModel;
+    this._commentsModel = commentsModel;
     this._films = [];
     this._renderSortFilms = this._renderSortFilms.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
@@ -45,10 +46,10 @@ export default class PageController {
     this._filmListContainerElement = this._container.querySelector(`.films-list__container`);
 
     if (this._films.length > 0) {
-      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, this._showingFilmsCount), this._onDataChange);
+      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, this._showingFilmsCount), this._onDataChange, this._commentsModel);
       this._showingFilms = this._showingFilms.concat(showingFilms);
       this._renderLoadMoreButton();
-      this._additionBlockController = new AdditionBlockController(this._filmContainerElement, this._moviesModel, this._onDataChange);
+      this._additionBlockController = new AdditionBlockController(this._filmContainerElement, this._moviesModel, this._onDataChange, this._commentsModel);
       this._additionBlockController.render();
       this._filmsInAdditionsBlocks = this._additionBlockController.showingFilms;
       this._showingFilms = this._showingFilms.concat(this._filmsInAdditionsBlocks);
@@ -66,7 +67,7 @@ export default class PageController {
       this._showingFilmsCount = this._showingFilmsCount + FILM_PAGE_COUNT;
 
       const sortedFilms = this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), prevFilmsCount, this._showingFilmsCount);
-      const showingFilms = renderFilms(this._filmListContainerElement, sortedFilms, this._onDataChange);
+      const showingFilms = renderFilms(this._filmListContainerElement, sortedFilms, this._onDataChange, this._commentsModel);
       this._showingFilms = this._showingFilms.concat(showingFilms);
 
       if (this._showingFilmsCount >= this._films.length) {
@@ -80,7 +81,7 @@ export default class PageController {
       this._showingFilmsCount = FILM_PAGE_COUNT;
       this._filmListContainerElement.innerHTML = ``;
       remove(this._moreButton);
-      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(sortType, 0, this._showingFilmsCount), this._onDataChange);
+      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(sortType, 0, this._showingFilmsCount), this._onDataChange, this._commentsModel);
       this._showingFilms = [].concat(showingFilms);
       this._showingFilms = this._showingFilms.concat(this._filmsInAdditionsBlocks);
       this._renderLoadMoreButton();
@@ -108,7 +109,7 @@ export default class PageController {
     this._removeFilms();
     this._films = this._moviesModel.getFilms();
     this._sort.setDefaultSortType();
-    const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, FILM_PAGE_COUNT), this._onDataChange);
+    const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, FILM_PAGE_COUNT), this._onDataChange, this._commentsModel);
     this._showingFilms = this._showingFilms.concat(showingFilms);
     this._showingFilmsCount = showingFilms.length;
     this._renderLoadMoreButton();
