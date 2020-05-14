@@ -1,7 +1,6 @@
 import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace, remove} from "../utils/render";
-import Comments from "../models/comments";
 
 const Mode = {
   DEFAULT: `default`,
@@ -12,7 +11,7 @@ const FormFilterTypes = {
   WATCHLIST: `watchlist`,
   WATCHED: `watched`,
   FAVORITE: `favorite`
-}
+};
 
 const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -117,7 +116,7 @@ export default class MovieController {
     if (this._filmCommentsModel.getCommentsForDelete().length > 0) {
       this._filmCommentsModel.getCommentsForDelete().forEach((commentId) => {
         const commentIndex = commentsIDs.indexOf(commentId);
-        if (commentIndex > -1 ) {
+        if (commentIndex > -1) {
           commentsIDs.splice(commentIndex, 1);
         }
       });

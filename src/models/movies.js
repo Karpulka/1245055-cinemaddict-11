@@ -8,6 +8,8 @@ export default class Movies {
     this._currentFilterType = FilterTypes.ALL;
     this._filterChangeHandlers = [];
     this._dataChangeHandlers = [];
+    this._dataCommentsChangeHandlers = [];
+    this._additionBlockChangeHandlers = [];
   }
 
   getAllFilms() {
@@ -25,6 +27,8 @@ export default class Movies {
       case FilterTypes.FAVORITES:
         return this._films.filter((elm) => elm.isFavorites);
     }
+
+    return this._films;
   }
 
   updateData(id, newFilm) {
@@ -34,8 +38,15 @@ export default class Movies {
       return;
     }
 
+    let isCommentsUpdate = !(this._films[index].comments === newFilm.comments);
+
     this._films = [].concat(this._films.slice(0, index), newFilm, this._films.slice(index + +1));
     this._callHandlers(this._dataChangeHandlers);
+
+    if (isCommentsUpdate) {
+      this._callHandlers(this._dataCommentsChangeHandlers);
+      this._callHandlers(this._additionBlockChangeHandlers);
+    }
   }
 
   setFilter(filterType) {
@@ -51,13 +62,21 @@ export default class Movies {
     this._dataChangeHandlers.push(handler);
   }
 
+  setAdditionBlockChangeHandler(handler) {
+    this._additionBlockChangeHandlers.push(handler);
+  }
+
+  setCommentsDataChangeHAndler(handler) {
+    this._dataCommentsChangeHandlers.push(handler);
+  }
+
   _callHandlers(handlers) {
     handlers.forEach((handler) => handler());
   }
 
   _getFilmsSortByRating(from, to) {
     return getFilmsSortByRating(this.getFilms(), from, to);
-  };
+  }
 
   getSortedFilms(sortType, from, to) {
     switch (sortType) {
@@ -69,10 +88,9 @@ export default class Movies {
         }).slice(from, to);
       case SORT_TYPE.RATING:
         return this._getFilmsSortByRating(from, to);
-        break;
       case SORT_TYPE.DEFAULT:
         return this.getFilms().slice(from, to);
-        break;
     }
-  };
+    return [];
+  }
 }

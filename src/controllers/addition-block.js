@@ -13,9 +13,20 @@ export default class AdditionBlockController {
     this._onDataChange = onDataChange;
     this._filmCommentsModel = commentsModel;
     this._showingFilms = [];
+    this._filmsSortByCommentsCount = null;
+    this._onCommentsDataChange = this._onCommentsDataChange.bind(this);
+    this._moviesModel.setCommentsDataChangeHAndler(this._onCommentsDataChange);
   }
 
   render() {
+    const oldFilmsSortByCommentsCount = this._filmsSortByCommentsCount;
+    this._filmsSortByCommentsCount = this._getFilmsSortByCommentsCount();
+
+    if (oldFilmsSortByCommentsCount) {
+      const mostCommentedBlockElement = this._container.querySelector(`.most-commented`);
+      mostCommentedBlockElement.querySelectorAll(`.film-card`).forEach((film) => film.remove());
+      this._showingFilms = [].concat(this._showingFilms, renderFilms(mostCommentedBlockElement, this._getFilmsSortByCommentsCount(), this._onDataChange, this._filmCommentsModel));
+    } else {
       for (let i = 0; i < FILM_COUNT_ADDITION; i++) {
         render(this._container, new AdditionBlock(), POSITION.BEFOREEND);
         const extraContainerElements = this._container.querySelectorAll(`.films-list--extra`);
@@ -33,6 +44,7 @@ export default class AdditionBlockController {
           this._showingFilms = this._showingFilms.concat(renderFilms(additionContainerElementFilmList, films, this._onDataChange, this._filmCommentsModel));
         }
       }
+    }
   }
 
   get showingFilms() {
@@ -45,5 +57,9 @@ export default class AdditionBlockController {
 
   _getFilmsSortByCommentsCount() {
     return getFilmsSortByCommentsCount(this._moviesModel.getAllFilms(), 0, FILM_COUNT_ADDITION);
+  }
+
+  _onCommentsDataChange() {
+    this.render();
   }
 }

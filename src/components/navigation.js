@@ -1,5 +1,4 @@
 import AbstractComponent from "./abstract-component";
-import AbstractSmartComponent from "./abstract-smart-component";
 
 const renderFilters = (filters) => {
   return filters
