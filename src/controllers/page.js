@@ -37,7 +37,7 @@ export default class PageController {
     this._filmListContainerElement = null;
     this._filmContainerElement = null;
     this._additionBlockController = null;
-    this._statisticComponent = new Staistic();
+    this._statisticComponent = new Staistic(moviesModel);
     this._statisticComponent.hide();
   }
 
@@ -114,6 +114,8 @@ export default class PageController {
 
     filmControllers.forEach((filmController) => filmController.render(newData));
     this._filtersController.render();
+    this._updateFilms();
+    this._statisticComponent.rerender();
   }
 
   _onAdditionBlockChange() {
@@ -131,6 +133,7 @@ export default class PageController {
 
   _updateFilms() {
     if (this._filtersController.getCurrentFilterType() === FilterTypes.STATISTIC) {
+      this._sort.hide();
       this._hide();
       this._statisticComponent.show();
     } else {
@@ -142,6 +145,7 @@ export default class PageController {
       this._showingFilmsCount = showingFilms.length;
       this._renderLoadMoreButton();
       this._statisticComponent.hide();
+      this._sort.show();
       this._show();
     }
   }

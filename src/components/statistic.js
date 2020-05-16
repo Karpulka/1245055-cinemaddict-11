@@ -1,6 +1,74 @@
 import AbstractSmartComponent from "./abstract-smart-component";
+import Chart from "chart.js";
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {formatFilmDurationForStatistic} from "../utils/common";
 
-const createStatisticTemplate = () => {
+const BAR_HEIGHT = 50;
+
+const renderStatisticChart = (statisticCtx, genres, counts) => {
+  statisticCtx.height = BAR_HEIGHT * genres.length;
+
+  new Chart(statisticCtx, {
+    plugins: [ChartDataLabels],
+    type: `horizontalBar`,
+    data: {
+      labels: genres,
+      datasets: [{
+        data: counts,
+        backgroundColor: `#ffe800`,
+        hoverBackgroundColor: `#ffe800`,
+        anchor: `start`
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 20
+          },
+          color: `#ffffff`,
+          anchor: 'start',
+          align: 'start',
+          offset: 40,
+        }
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#ffffff`,
+            padding: 100,
+            fontSize: 20
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 24
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false
+      }
+    }
+  });
+};
+
+
+const createStatisticTemplate = (watchedFilmsCount, sumDuration, favoriteGenre) => {
+  const time = formatFilmDurationForStatistic(sumDuration).split(':');
   return `<section class="statistic">
     <p class="statistic__rank">
       Your rank
@@ -30,16 +98,16 @@ const createStatisticTemplate = () => {
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${watchedFilmsCount} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+        <p class="statistic__item-text">${time[0]} <span class="statistic__item-description">h</span> ${time[0] > 0 ? time[1] : 0} <span class="statistic__item-description">m</span></p>
       </li>
-      <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">Sci-Fi</p>
-      </li>
+      ${watchedFilmsCount > 0 ? `<li class="statistic__text-item">
+                                   <h4 class="statistic__item-title">Top genre</h4>
+                                   <p class="statistic__item-text">${favoriteGenre}</p>
+                                 </li>` : ``}
     </ul>
 
     <div class="statistic__chart-wrap">
@@ -50,13 +118,87 @@ const createStatisticTemplate = () => {
 };
 
 export default class Staistic extends AbstractSmartComponent {
-  constructor() {
+  constructor(moviesModel) {
     super();
+    this._moviesModel = moviesModel;
+    this._statisticChart = null;
+    this._watchedFilms = [];
+    this._sortedWatchedFilmsByGenre = [];
+    this._genreTitles = [];
+    this._genreCounts = [];
+    this._favoriteGenre = null;
+    this._sumDuration = 0;
+
+    this._renderStatistic();
   }
 
   getTemplate() {
-    return createStatisticTemplate();
+    return createStatisticTemplate(this._watchedFilms.length, this._sumDuration, this._favoriteGenre);
+  }
+
+  show() {
+    super.show();
+
+    this.rerender();
+  }
+
+  rerender() {
+    super.rerender();
+
+    this._renderStatistic();
   }
 
   recoveryListeners() {}
+
+  _generateStatistic() {
+    this._watchedFilms = this._moviesModel.getAllFilms().filter((film) => film.isWatched);
+
+    this._watchedFilms.forEach((film) => {
+      const genres = film.genres.split(',');
+      genres.forEach((filmGenre) => {
+        const index = this._sortedWatchedFilmsByGenre.findIndex((genre) => genre.name === filmGenre.trim());
+        if (index > -1) {
+          ++this._sortedWatchedFilmsByGenre[index].count;
+          this._sortedWatchedFilmsByGenre[index].sumDuration += film.duration;
+        } else {
+          this._sortedWatchedFilmsByGenre.push({
+            name: filmGenre.trim(),
+            count: 1
+          });
+        }
+      });
+    });
+
+    this._genreTitles = this._sortedWatchedFilmsByGenre.map((genreInfo) => genreInfo.name);
+    this._genreCounts = this._sortedWatchedFilmsByGenre.map((genreInfo) => genreInfo.count);
+
+    const maxGenreCount = Math.max(...this._genreCounts);
+    const indexMaxGenreCount = this._genreCounts.indexOf(maxGenreCount);
+    this._favoriteGenre = this._genreTitles[indexMaxGenreCount];
+    this._sumDuration = this._watchedFilms.reduce((sumDuration, film) => sumDuration + film.duration, this._sumDuration);
+  }
+
+  _renderStatistic() {
+    const element = this.getElement();
+    const statisticCtx = element.querySelector(`.statistic__chart`);
+
+    this._resetStatistic();
+    this._generateStatistic();
+
+    this._statisticChart = renderStatisticChart(statisticCtx, this._genreTitles, this._genreCounts);
+  }
+
+  _resetStatistic() {
+    this._watchedFilms = [];
+    this._sortedWatchedFilmsByGenre = [];
+    this._genreTitles = [];
+    this._genreCounts = [];
+    this._favoriteGenre = null;
+    this._sumDuration = 0;
+
+    if (this._statisticChart) {
+      this._statisticChart.destroy();
+      this._statisticChart = null;
+    }
+  }
 }
