@@ -87,8 +87,10 @@ export default class MovieController {
   }
 
   _setMarkAsWatched() {
+    const watchingDate = this._film.isWatched ? null : new Date();
     this._onDataChange(this._film, Object.assign({}, this._film, {
-      isWatched: !this._film.isWatched
+      isWatched: !this._film.isWatched,
+      watchingDate
     }));
   }
 

@@ -5,7 +5,8 @@ export const FilterTypes = {
   ALL: `all`,
   WATCHLIST: `watchlist`,
   HISTORY: `history`,
-  FAVORITES: `favorites`
+  FAVORITES: `favorites`,
+  STATISTIC: `stats`
 };
 
 export default class FilterController {
@@ -21,13 +22,19 @@ export default class FilterController {
 
   render() {
     const oldNavigation = this._navigation;
-    this._navigation = new Navigation(this._generateFilters());
+    const isStatisticCheck = this._currentFilter === FilterTypes.STATISTIC;
+    this._navigation = new Navigation(this._generateFilters(), isStatisticCheck);
     this._navigation.setFilterChangeHandler(this._setChangeFilterHandlers);
+    this._navigation.setStatisticClickHandler(this._setChangeFilterHandlers);
     if (oldNavigation) {
       replace(oldNavigation, this._navigation);
     } else {
       render(this._container, this._navigation, POSITION.AFTERBEGIN);
     }
+  }
+
+  getCurrentFilterType() {
+    return this._currentFilter;
   }
 
   _setChangeFilterHandlers(evt) {

@@ -4,6 +4,7 @@ import {render, POSITION} from "./utils/render";
 import PageController from "./controllers/page";
 import Movies from "./models/movies";
 import Comments from "./models/comments";
+import Staistic from "./components/statistic";
 
 const FILM_COUNT = 22;
 const mainContainerElement = document.querySelector(`.main`);

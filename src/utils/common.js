@@ -20,8 +20,12 @@ const formatFilmDuration = (movieDuration) => {
   return moment.duration(movieDuration, `minutes`).format(`h[h] m[m]`);
 };
 
+const formatFilmDurationForStatistic = (movieDuration) => {
+  return moment.duration(movieDuration, `minutes`).format(`h:m`);
+};
+
 const sortByDesc = (a, b) => {
   return b - a;
 };
 
-export {getRandomNumber, getRandomItemFromArray, formatDateTime, sortByDesc, formatFilmDuration};
+export {getRandomNumber, getRandomItemFromArray, formatDateTime, sortByDesc, formatFilmDuration, formatFilmDurationForStatistic};

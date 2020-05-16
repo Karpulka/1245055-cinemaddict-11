@@ -85,6 +85,16 @@ const getCommentDate = () => {
   return currentDate;
 };
 
+const getRandomDate = () => {
+  const targetDate = new Date();
+  const sign = Math.random() > 0.5 ? 1 : -1;
+  const diffValue = sign * getRandomNumber(0, 365);
+
+  targetDate.setDate(targetDate.getDate() + diffValue);
+
+  return targetDate;
+};
+
 export const getAllComments = [];
 
 const generateComments = () => {
@@ -127,6 +137,8 @@ const createFilm = (key) => {
   const month = getRandomItemFromArray(MONTHS);
   const name = `Film ${key || `Film Film`}`;
 
+  const isWatched = Math.random() > 0.5;
+
   return {
     id: Date.now() + getRandomNumber(1, 10000),
     name,
@@ -140,8 +152,9 @@ const createFilm = (key) => {
     poster: getRandomItemFromArray(FILM_POSTERS),
     age: getRandomItemFromArray(AGES),
     isWatchlist: Math.random() > 0.5,
-    isWatched: Math.random() > 0.5,
+    isWatched,
     isFavorites: Math.random() > 0.5,
+    watchingDate: isWatched ? getRandomDate() : null,
     details: [
       {
         term: `Director`,
