@@ -4,8 +4,9 @@ import NoFilm from "../components/no-film";
 import Sort from "../components/sort";
 import ContentBlock from "../components/content-block";
 import {renderFilms} from "./movie";
-import FilterController from "./filter";
+import FilterController, {FilterTypes} from "./filter";
 import AdditionBlockController from "./addition-block";
+import Staistic from "../components/statistic";
 
 const FILM_PAGE_COUNT = 5;
 
@@ -31,11 +32,13 @@ export default class PageController {
     this._updateFilms = this._updateFilms.bind(this);
     this._removeFilms = this._removeFilms.bind(this);
     this._onAdditionBlockChange = this._onAdditionBlockChange.bind(this);
-    this._moviesModel.setFilterChangeHandler(this._onFilterChange);
+    this._moviesModel.setFilterChangeHandlers(this._onFilterChange);
     this._moviesModel.setAdditionBlockChangeHandler(this._onAdditionBlockChange);
     this._filmListContainerElement = null;
     this._filmContainerElement = null;
     this._additionBlockController = null;
+    this._statisticComponent = new Staistic();
+    this._statisticComponent.hide();
   }
 
   render() {
@@ -59,6 +62,20 @@ export default class PageController {
     } else {
       this._filmListContainerElement.remove();
       render(this._filmContainerElement.querySelector(`.films-list`), this._noFilm, POSITION.BEFOREEND);
+    }
+
+    render(this._container, this._statisticComponent, POSITION.BEFOREEND);
+  }
+
+  _show() {
+    if (this._filmContainerElement.classList.contains(`visually-hidden`)) {
+      this._filmContainerElement.classList.remove(`visually-hidden`);
+    }
+  }
+
+  _hide() {
+    if (!this._filmContainerElement.classList.contains(`visually-hidden`)) {
+      this._filmContainerElement.classList.add(`visually-hidden`);
     }
   }
 
@@ -113,13 +130,20 @@ export default class PageController {
   }
 
   _updateFilms() {
-    this._removeFilms();
-    this._films = this._moviesModel.getFilms();
-    this._sort.setDefaultSortType();
-    const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, FILM_PAGE_COUNT), this._onDataChange, this._commentsModel);
-    this._showingFilms = this._showingFilms.concat(showingFilms);
-    this._showingFilmsCount = showingFilms.length;
-    this._renderLoadMoreButton();
+    if (this._filtersController.getCurrentFilterType() === FilterTypes.STATISTIC) {
+      this._hide();
+      this._statisticComponent.show();
+    } else {
+      this._sort.setDefaultSortType();
+      this._removeFilms();
+      this._films = this._moviesModel.getFilms();
+      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, FILM_PAGE_COUNT), this._onDataChange, this._commentsModel);
+      this._showingFilms = this._showingFilms.concat(showingFilms);
+      this._showingFilmsCount = showingFilms.length;
+      this._renderLoadMoreButton();
+      this._statisticComponent.hide();
+      this._show();
+    }
   }
 
   _removeFilms() {
