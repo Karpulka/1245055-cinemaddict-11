@@ -37,6 +37,19 @@ export default class FilterController {
     return this._currentFilter;
   }
 
+  getCurrentFilterTypeFilmsCount() {
+    switch (this._currentFilter) {
+      case FilterTypes.WATCHLIST:
+        return this._moviesModel.getAllFilms().filter((elm) => elm.isWatchlist).length;
+      case FilterTypes.FAVORITES:
+        return this._moviesModel.getAllFilms().filter((elm) => elm.isFavorites).length;
+      case FilterTypes.HISTORY:
+        return this._moviesModel.getAllFilms().filter((elm) => elm.isWatched).length;
+    }
+
+    return this._moviesModel.getAllFilms().length;
+  }
+
   _setChangeFilterHandlers(evt) {
     evt.preventDefault();
     this._currentFilter = evt.target.getAttribute(`href`).replace(`#`, ``);

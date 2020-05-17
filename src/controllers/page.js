@@ -80,6 +80,9 @@ export default class PageController {
   }
 
   _renderLoadMoreButton() {
+    if (this._filtersController.getCurrentFilterTypeFilmsCount() <= FILM_PAGE_COUNT) {
+      return;
+    }
     render(this._filmListContainerElement, this._moreButton, POSITION.AFTEREND);
     this._moreButton.setClickHandler(() => {
       const prevFilmsCount = this._showingFilmsCount;
@@ -114,8 +117,8 @@ export default class PageController {
 
     filmControllers.forEach((filmController) => filmController.render(newData));
     this._filtersController.render();
-    this._updateFilms();
     this._statisticComponent.rerender();
+    this._updateFilms(false);
   }
 
   _onAdditionBlockChange() {
@@ -131,7 +134,7 @@ export default class PageController {
     this._updateFilms();
   }
 
-  _updateFilms() {
+  _updateFilms(resetShowingFilmsCount = true) {
     if (this._filtersController.getCurrentFilterType() === FilterTypes.STATISTIC) {
       this._sort.hide();
       this._hide();
@@ -140,7 +143,8 @@ export default class PageController {
       this._sort.setDefaultSortType();
       this._removeFilms();
       this._films = this._moviesModel.getFilms();
-      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, FILM_PAGE_COUNT), this._onDataChange, this._commentsModel);
+      const filmsCount = resetShowingFilmsCount ? FILM_PAGE_COUNT : this._showingFilmsCount;
+      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, filmsCount), this._onDataChange, this._commentsModel);
       this._showingFilms = this._showingFilms.concat(showingFilms);
       this._showingFilmsCount = showingFilms.length;
       this._renderLoadMoreButton();
