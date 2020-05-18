@@ -179,7 +179,7 @@ export default class Staistic extends AbstractSmartComponent {
     this._sortedWatchedFilms = this._filterFilmsByWatchingDate();
 
     this._sortedWatchedFilms.forEach((film) => {
-      const genres = film.genres.split(`,`);
+      const genres = film.genres ? film.genres.split(`,`) : [];
       genres.forEach((filmGenre) => {
         const index = this._sortedWatchedFilmsByGenre.findIndex((genre) => genre.name === filmGenre.trim());
         if (index > -1) {
