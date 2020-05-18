@@ -1,6 +1,7 @@
 import FilmCard from "../components/film-card";
 import FilmDetails from "../components/film-details";
 import {POSITION, render, toggleElement, replace, remove} from "../utils/render";
+import CommentModel from "../models/comment";
 
 const Mode = {
   DEFAULT: `default`,
@@ -13,21 +14,18 @@ const FormFilterTypes = {
   FAVORITE: `favorite`
 };
 
-const getRandomNumber = (min, max) => {
-  return Math.floor(Math.random() * (max - min)) + min;
-};
-
-export const renderFilms = (container, films, onDataChange, commentsModel) => {
+export const renderFilms = (container, films, onDataChange, commentsModel, api) => {
   return films.map((film) => {
-    const filmController = new MovieController(container, onDataChange, commentsModel);
+    const filmController = new MovieController(container, onDataChange, commentsModel, api);
     filmController.render(film);
     return filmController;
   });
 };
 
 export default class MovieController {
-  constructor(container, onDataChange, commentsModel) {
+  constructor(container, onDataChange, commentsModel, api) {
     this._container = container;
+    this._api = api;
     this._onDataChange = onDataChange;
     this._mode = Mode.DEFAULT;
     this._filmComponent = null;
@@ -71,6 +69,7 @@ export default class MovieController {
     } else {
       render(this._container, this._filmComponent, POSITION.BEFOREEND);
     }
+
     this._setMovieHandlers();
   }
 
@@ -109,38 +108,23 @@ export default class MovieController {
   }
 
   _onSubmitForm() {
-    const filmDetailComponent = this._filmDetailsComponent;
-    const commentText = filmDetailComponent.getElement().querySelector(`.film-details__comment-input`).value;
-    const emoji = filmDetailComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
-
-    const commentsIDs = this._film.comments.slice();
-
-    if (this._filmCommentsModel.getCommentsForDelete().length > 0) {
-      this._filmCommentsModel.getCommentsForDelete().forEach((commentId) => {
-        const commentIndex = commentsIDs.indexOf(commentId);
-        if (commentIndex > -1) {
-          commentsIDs.splice(commentIndex, 1);
-        }
-      });
-      this._filmCommentsModel.deleteComments();
-    }
+    const commentText = this._filmDetailsComponent.getElement().querySelector(`.film-details__comment-input`).value;
+    const emoji = this._filmDetailsComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
 
     if (commentText && emoji) {
-      const id = getRandomNumber(1, 1000) + getRandomNumber(1001, 10000);
       const newComment = {
-        id,
         comment: commentText,
         emotion: emoji.value,
-        author: `Current Author`,
         date: new Date()
       };
 
-      this._filmCommentsModel.addComment(newComment);
-      commentsIDs.push(id);
+      this._api.addComment(this._film.id, new CommentModel(newComment))
+        .then((comments) => {
+          const addedComment = comments.filter((comment) => this._film.comments.indexOf(comment.id) === -1);
+          this._filmCommentsModel.addComment(addedComment);
+          this._onDataChange(this._film, Object.assign({}, this._film, null));
+        });
     }
-    this._onDataChange(this._film, Object.assign({}, this._film, {comments: commentsIDs}));
-
-    this._filmDetailsComponent.rerender();
   }
 
   _onChangeFormFilterInput(evt) {
@@ -186,9 +170,12 @@ export default class MovieController {
     evt.preventDefault();
 
     const id = evt.target.getAttribute(`data-id`);
-    this._filmCommentsModel.addCommentForDelete(id);
-    evt.target.closest(`.film-details__comment`).remove();
-    this._filmDetailsComponent.getElement().querySelector(`.film-details__comments-count`).textContent = this._filmDetailsComponent.getElement().querySelectorAll(`.film-details__comments-list > .film-details__comment`).length;
+
+    this._api.deleteComment(id)
+      .then(() => {
+        this._filmCommentsModel.deleteComment(id);
+        this._onDataChange(this._film, Object.assign({}, this._film, null));
+      });
   }
 
   destroy() {

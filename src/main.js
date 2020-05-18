@@ -18,7 +18,7 @@ const renderPage = (movies = [], comments = []) => {
   const moviesModel = new Movies(movies);
   const commentsModel = new Comments(comments);
 
-  new PageController(mainContainerElement, moviesModel, commentsModel).render();
+  new PageController(mainContainerElement, moviesModel, commentsModel, api).render();
   footerElement.querySelector(`.footer__statistics`).textContent = `${films.length} movies inside`;
 };
 

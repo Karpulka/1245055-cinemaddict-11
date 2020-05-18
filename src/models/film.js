@@ -1,3 +1,5 @@
+import {parseDataForUpdate} from "../utils/film";
+
 export default class FilmModel {
   constructor(data) {
     this.id = data[`id`];
@@ -44,36 +46,7 @@ export default class FilmModel {
   }
 
   toRAW() {
-    const releaseDate = this.details.find((item) => item.term === `Release Date`).info;
-    const writers = this.details.find((item) => item.term === `Writers`).info;
-    const actors = this.details.find((item) => item.term === `Actors`).info;
-    return {
-      "id": this.id,
-      "comments": this.comments,
-      "film_info": {
-        "title": this.name,
-        "alternative_title": this.originalName,
-        "total_rating": this.rating,
-        "poster": this.poster,
-        "age_rating": this.age,
-        "director": this.details.find((item) => item.term === `Director`).info,
-        "writers": writers ? writers.split(`, `) : [],
-        "actors": actors ? actors.split(`, `) : [],
-        "release": {
-          "date": releaseDate ? releaseDate.toISOString() : null,
-          "release_country": this.details.find((item) => item.term === `Country`).info
-        },
-        "runtime": this.details.find((item) => item.term === `Runtime`).info,
-        "genre": this.genres ? this.genres.split(`, `) : [],
-        "description": this.description
-      },
-      "user_details": {
-        "watchlist": this.isWatchlist,
-        "already_watched": this.isWatched,
-        "watching_date": this.watchingDate ? this.watchingDate.toISOString() : null,
-        "favorite": this.isFavorites
-      }
-    };
+    return parseDataForUpdate(this);
   }
 
   static parseFilm(data) {
