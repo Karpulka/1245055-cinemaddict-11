@@ -8,6 +8,8 @@ const Method = {
   DELETE: `DELETE`
 };
 
+const CONTENT_TYPE_HEADER = new Headers({"Content-Type": `application/json`});
+
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -39,7 +41,7 @@ export default class API {
       url: `movies/${id}`,
       method: Method.PUT,
       body: JSON.stringify(data.toRAW()),
-      headers: new Headers({"Content-Type": `application/json`})
+      headers: CONTENT_TYPE_HEADER
     })
       .then((response) => response.json())
       .then(FilmModel.parseFilm);
@@ -57,7 +59,7 @@ export default class API {
       url: `comments/${filmId}`,
       method: Method.POST,
       body: JSON.stringify(data.toRAW()),
-      headers: new Headers({"Content-Type": `application/json`})
+      headers: CONTENT_TYPE_HEADER
     })
       .then((response) => response.json())
       .then((movieInfo) => CommentModel.parseComments(movieInfo.comments));
