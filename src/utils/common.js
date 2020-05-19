@@ -2,30 +2,32 @@ import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
 momentDurationFormatSetup(moment);
 
-const getRandomNumber = (min, max) => {
+export const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 };
 
-const getRandomItemFromArray = (array) => {
+export const getRandomItemFromArray = (array) => {
   const min = 0;
   const max = array.length;
   return array[getRandomNumber(min, max)];
 };
 
-const formatDateTime = (date) => {
+export const formatDateTime = (date) => {
   return moment(date).format(`YYYY/MM/DD hh:mm`);
 };
 
-const formatFilmDuration = (movieDuration) => {
+export const formatFilmDuration = (movieDuration) => {
   return moment.duration(movieDuration, `minutes`).format(`h[h] m[m]`);
 };
 
-const formatFilmDurationForStatistic = (movieDuration) => {
+export const formatFilmReleaseDate = (date) => {
+  return moment(date).format(`DD MMMM YYYY`);
+};
+
+export const formatFilmDurationForStatistic = (movieDuration) => {
   return moment.duration(movieDuration, `minutes`).format(`h:m`);
 };
 
-const sortByDesc = (a, b) => {
+export const sortByDesc = (a, b) => {
   return b - a;
 };
-
-export {getRandomNumber, getRandomItemFromArray, formatDateTime, sortByDesc, formatFilmDuration, formatFilmDurationForStatistic};

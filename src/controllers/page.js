@@ -114,18 +114,29 @@ export default class PageController {
   }
 
   _onDataChange(oldData, newData) {
-    const newFilm = newData ? new FilmModel(parseDataForUpdate(newData)) : new FilmModel(parseDataForUpdate(oldData));
-    this._api.updateFilm(oldData.id, newFilm)
-      .then((film) => {
-        this._moviesModel.updateData(film.id, film);
+    if (newData) {
+      this._api.updateFilm(oldData.id, new FilmModel(parseDataForUpdate(newData)))
+        .then((filmModel) => {
+          this._updateFilmsAfterRequests(filmModel);
+        });
+    } else {
+      this._api.getFilms()
+        .then((filmModels) => {
+          const filmModel = filmModels.find((film) => film.id === oldData.id);
+          this._updateFilmsAfterRequests(filmModel);
+        })
+    }
+  }
 
-        const filmControllers = this._showingFilms.filter((filmController) => filmController.film === oldData);
+  _updateFilmsAfterRequests(film) {
+    this._moviesModel.updateData(film.id, film);
 
-        filmControllers.forEach((filmController) => filmController.render(film));
-        this._filtersController.render();
-        this._statisticComponent.rerender();
-        this._statisticComponent.hide();
-      });
+    const filmControllers = this._showingFilms.filter((filmController) => filmController.film.id === film.id);
+    filmControllers.forEach((filmController) => filmController.render(film));
+
+    this._filtersController.render();
+    this._statisticComponent.rerender();
+    this._statisticComponent.hide();
   }
 
   _onAdditionBlockChange() {
@@ -141,7 +152,7 @@ export default class PageController {
     this._updateFilms();
   }
 
-  _updateFilms() {
+  _updateFilms(resetShoingFilmsCount = true) {
     if (this._filtersController.getCurrentFilterType() === FilterTypes.STATISTIC) {
       this._sort.hide();
       this._hide();
@@ -150,7 +161,8 @@ export default class PageController {
       this._sort.setDefaultSortType();
       this._removeFilms();
       this._films = this._moviesModel.getFilms();
-      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, FILM_PAGE_COUNT), this._onDataChange, this._commentsModel, this._api);
+      const showingFilmsCount = resetShoingFilmsCount ? FILM_PAGE_COUNT : this._showingFilmsCount;
+      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, showingFilmsCount), this._onDataChange, this._commentsModel, this._api);
       this._showingFilms = this._showingFilms.concat(showingFilms);
       this._showingFilmsCount = showingFilms.length;
       this._renderLoadMoreButton();

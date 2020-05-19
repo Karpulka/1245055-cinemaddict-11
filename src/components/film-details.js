@@ -1,16 +1,27 @@
-import {formatDateTime, formatFilmDuration} from "../utils/common";
+import {formatDateTime, formatFilmDuration, formatFilmReleaseDate} from "../utils/common";
 import AbstractSmartComponent from "./abstract-smart-component";
 import {encode} from "he";
 
+const ERROR_SUBMIT_STYLE = `1px solid #ff0000`;
 const EMOJI_PATH = `./images/emoji/`;
 
 const renderFilmDetailsRow = (details) => {
   return details
     .map((detail) => {
       const {term, info} = detail;
+      let showingInfo = info;
+      switch (term) {
+        case `Release Date`:
+          showingInfo = showingInfo ? formatFilmReleaseDate(showingInfo) : ``;
+          break;
+        case `Runtime`:
+          showingInfo = info ? formatFilmDuration(info) : ``;
+          break;
+      }
+
       return `<tr class="film-details__row">
                 <td class="film-details__term">${term}</td>
-                <td class="film-details__cell">${term === `Runtime` ? formatFilmDuration(info) : info}</td>
+                <td class="film-details__cell">${showingInfo}</td>
               </tr>`;
     })
     .join(`\n`);
@@ -216,5 +227,25 @@ export default class FilmDetails extends AbstractSmartComponent {
     this.setFormElementsChangeHandler();
     this.setFormFilterInputChangeHandler(this._setFilterInputHandler);
     this.setDeleteCommentButtonClickHandler(this._deleteButtonHandler);
+  }
+
+  disableForm() {
+    this.getElement().querySelectorAll(`form input, form textarea, form button`).forEach((formElement) => formElement.setAttribute(`disabled`, `disabled`));
+  }
+
+  activateForm() {
+    this.getElement().querySelectorAll(`form input, form textarea, form button`).forEach((formElement) => formElement.removeAttribute(`disabled`));
+  }
+
+  setSendFormErrorStyles() {
+    this.getElement().classList.add(`shake`);
+    this.getElement().querySelector(`.film-details__comment-input`).style.border = ERROR_SUBMIT_STYLE;
+  }
+
+  removeSendFormErrorStyles() {
+    if (this.getElement().classList.contains(`shake`)) {
+      this.getElement().classList.remove(`shake`);
+    }
+    this.getElement().querySelector(`.film-details__comment-input`).style.border = `0`;
   }
 }
