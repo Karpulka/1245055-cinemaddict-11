@@ -36,7 +36,7 @@ const renderGenres = (genres) => {
     .join(`\n`);
 };
 
-const renderComments = (comments) => {
+const renderComments = (comments, deletingComments = []) => {
   const result = comments.map((comment) => {
     const {comment: commentText, emotion, author, date, id} = comment;
     return `<li class="film-details__comment">
@@ -48,7 +48,7 @@ const renderComments = (comments) => {
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
                   <span class="film-details__comment-day">${formatDateTime(date)}</span>
-                  <button class="film-details__comment-delete" data-id="${id}">Delete</button>
+                  <button class="film-details__comment-delete" data-id="${id}" ${deletingComments.indexOf(id) > -1 ? `disabled` : ``}>${deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`}</button>
                 </p>
               </div>
             </li>`;
@@ -56,7 +56,7 @@ const renderComments = (comments) => {
   return `<ul class="film-details__comments-list">${result}</ul>`;
 };
 
-const createFilmDetailsTemplate = (film, comments) => {
+const createFilmDetailsTemplate = (film, comments, deletingComments) => {
   const {name, originalName, rating, genres, description, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
 
   return `<section class="film-details">
@@ -114,7 +114,7 @@ const createFilmDetailsTemplate = (film, comments) => {
                 <section class="film-details__comments-wrap">
                   <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
           
-                  ${comments.length > 0 ? renderComments(comments) : ``}
+                  ${comments.length > 0 ? renderComments(comments, deletingComments) : ``}
           
                   <div class="film-details__new-comment">
                     <div for="add-emoji" class="film-details__add-emoji-label"></div>
@@ -159,6 +159,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._closeClickHandler = null;
     this._setFilterInputHandler = null;
     this._deleteButtonHandler = null;
+    this._deletingComments = [];
   }
 
   rerender() {
@@ -179,7 +180,20 @@ export default class FilmDetails extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film, this._commentsModel.getComments(this._film.comments));
+    return createFilmDetailsTemplate(this._film, this._commentsModel.getComments(this._film.comments), this._deletingComments);
+  }
+
+  addDeleteCommentID(id) {
+    this._deletingComments.push(id);
+    this.rerender();
+  }
+
+  removeDeleteCommentID(id) {
+    const index = this._deletingComments.indexOf(id);
+    if (index > -1) {
+      this._deletingComments.splice(index, 1);
+      this.rerender();
+    }
   }
 
   setCloseClickHandler(handler) {
@@ -240,6 +254,17 @@ export default class FilmDetails extends AbstractSmartComponent {
   setSendFormErrorStyles() {
     this.getElement().classList.add(`shake`);
     this.getElement().querySelector(`.film-details__comment-input`).style.border = ERROR_SUBMIT_STYLE;
+  }
+
+  setDeleteCommentErrorStyles(id) {
+    this.getElement().querySelector(`.film-details__comment-delete[data-id="${id}"]`).closest(`.film-details__comment`).classList.add(`shake`);
+  }
+
+  removeDeleteCommentErrorStyles(id) {
+    const deleteElement = this.getElement().querySelector(`.film-details__comment-delete[data-id="${id}"]`).closest(`.film-details__comment`);
+    if (deleteElement.classList.contains(`shake`)) {
+      deleteElement.classList.remove(`shake`);
+    }
   }
 
   removeSendFormErrorStyles() {

@@ -178,11 +178,17 @@ export default class MovieController {
     evt.preventDefault();
 
     const id = evt.target.getAttribute(`data-id`);
+    this._filmDetailsComponent.addDeleteCommentID(id);
+    this._filmDetailsComponent.removeDeleteCommentErrorStyles(id);
 
     this._api.deleteComment(id)
       .then(() => {
         this._filmCommentsModel.deleteComment(id);
         this._onDataChange(this._film, null);
+      })
+      .catch(() => {
+        this._filmDetailsComponent.removeDeleteCommentID(id);
+        this._filmDetailsComponent.setDeleteCommentErrorStyles(id);
       });
   }
 
