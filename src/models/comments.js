@@ -1,7 +1,6 @@
 export default class Comments {
   constructor(comments) {
     this._allComments = comments;
-    this._commentForDeleteIds = [];
   }
 
   getComments(ids) {

@@ -107,7 +107,9 @@ export default class MovieController {
     this._filmDetailsComponent.setDeleteCommentButtonClickHandler(this._onDeleteButtonClick);
   }
 
-  _onSubmitForm() {
+  _onSubmitForm(evt) {
+    evt.preventDefault();
+    this._filmDetailsComponent.removeSendFormErrorStyles();
     const commentText = this._filmDetailsComponent.getElement().querySelector(`.film-details__comment-input`).value;
     const emoji = this._filmDetailsComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
 
@@ -118,11 +120,17 @@ export default class MovieController {
         date: new Date()
       };
 
+      this._filmDetailsComponent.disableForm();
+
       this._api.addComment(this._film.id, new CommentModel(newComment))
         .then((comments) => {
           const addedComment = comments.filter((comment) => this._film.comments.indexOf(comment.id) === -1);
           this._filmCommentsModel.addComment(addedComment);
-          this._onDataChange(this._film, Object.assign({}, this._film, null));
+          this._onDataChange(this._film, null);
+        })
+        .catch(() => {
+          this._filmDetailsComponent.activateForm();
+          this._filmDetailsComponent.setSendFormErrorStyles();
         });
     }
   }
@@ -162,7 +170,7 @@ export default class MovieController {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       this._closeFilmDetails();
     } else if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
-      this._onSubmitForm();
+      this._onSubmitForm(evt);
     }
   }
 
@@ -170,11 +178,17 @@ export default class MovieController {
     evt.preventDefault();
 
     const id = evt.target.getAttribute(`data-id`);
+    this._filmDetailsComponent.addDeleteCommentID(id);
+    this._filmDetailsComponent.removeDeleteCommentErrorStyles(id);
 
     this._api.deleteComment(id)
       .then(() => {
         this._filmCommentsModel.deleteComment(id);
-        this._onDataChange(this._film, Object.assign({}, this._film, null));
+        this._onDataChange(this._film, null);
+      })
+      .catch(() => {
+        this._filmDetailsComponent.removeDeleteCommentID(id);
+        this._filmDetailsComponent.setDeleteCommentErrorStyles(id);
       });
   }
 
