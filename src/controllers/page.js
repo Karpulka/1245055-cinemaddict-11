@@ -124,7 +124,7 @@ export default class PageController {
         .then((filmModels) => {
           const filmModel = filmModels.find((film) => film.id === oldData.id);
           this._updateFilmsAfterRequests(filmModel);
-        })
+        });
     }
   }
 
