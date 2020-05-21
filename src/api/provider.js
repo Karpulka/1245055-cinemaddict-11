@@ -1,15 +1,6 @@
 import FilmModel from "../models/film";
 import CommentModel from "../models/comment";
 
-const isOnline = () => {
-  return window.navigator.onLine;
-};
-
-const getSyncedFilms = (items) => {
-  return items.filter(({success}) => success)
-    .map(({payload}) => payload.film);
-};
-
 const createStoreStructure = (items) => {
   return items.reduce((concatItems, current) => {
     return Object.assign({}, concatItems, {
@@ -24,8 +15,12 @@ export default class Provider {
     this._store = store;
   }
 
+  isOnline() {
+    return window.navigator.onLine;
+  }
+
   getFilms() {
-    if (isOnline()) {
+    if (this.isOnline()) {
       return this._api.getFilms()
         .then((films) => {
           const items = createStoreStructure(films.map((film) => film.toRAW()));
@@ -41,7 +36,7 @@ export default class Provider {
   }
 
   loadComments(filmId) {
-    if (isOnline()) {
+    if (this.isOnline()) {
       return this._api.loadComments(filmId)
         .then((comments) => {
           const items = createStoreStructure(comments);
@@ -58,7 +53,7 @@ export default class Provider {
   }
 
   updateFilm(id, film) {
-    if (isOnline()) {
+    if (this.isOnline()) {
       return this._api.updateFilm(id, film)
         .then((newFilm) => {
           this._store.setFilm(newFilm.id, newFilm.toRAW());
@@ -75,7 +70,7 @@ export default class Provider {
   }
 
   deleteComment(id) {
-    if (isOnline()) {
+    if (this.isOnline()) {
       return this._api.deleteComment(id)
         .then(() => {
           this._store.removeComment(id);
@@ -88,7 +83,7 @@ export default class Provider {
   }
 
   addComment(filmId, data) {
-    if (isOnline()) {
+    if (this.isOnline()) {
       return this._api.addComment(filmId, data)
         .then((comments) => {
           this._store.setComment(filmId, comments);
@@ -101,14 +96,12 @@ export default class Provider {
   }
 
   sync() {
-    if (isOnline()) {
-      const storeFilms = Object.values(this._store.getItems());
+    if (this.isOnline()) {
+      const storeFilms = Object.values(this._store.getItems().films);
 
       return this._api.sync(storeFilms)
         .then((response) => {
-          const updatedFilms = getSyncedFilms(response.updated);
-
-          const items = createStoreStructure([...updatedFilms]);
+          const items = createStoreStructure(response.updated.map((film) => film.toRAW()));
 
           this._store.setFilms(items);
         });
