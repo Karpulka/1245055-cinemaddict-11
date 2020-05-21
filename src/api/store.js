@@ -14,23 +14,22 @@ export default class Store {
 
   setFilms(items) {
     const store = this.getItems();
-    const newStore = {films: {...items}, comments: {...store.comments}};
+    const newStore = {films: items, comments: store.comments ? [...store.comments] : []};
 
     this._storage.setItem(this._storeKey, JSON.stringify(newStore));
   }
 
   setFilm(key, value) {
     const store = this.getItems();
-    const films = Object.assign({}, store.films, {[key]: value});
-    const newStore = {films: films, comments: {...store.comments}};
+    store.films[key] = value;
 
-    this._storage.setItem(this._storeKey, JSON.stringify(Object.assign({}, store, newStore)));
+    this._storage.setItem(this._storeKey, JSON.stringify(store));
   }
 
   setComments(filmId, items) {
     const store = this.getItems();
-    const filmComments = {[filmId]: items}
-    const newStore = {films: {...store.films}, comments: {...store.comments, ...filmComments}};
+    store.comments.push({[filmId]: items});
+    const newStore = {films: store.films, comments: store.comments};
 
     this._storage.setItem(this._storeKey, JSON.stringify(newStore));
   }

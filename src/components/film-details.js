@@ -48,9 +48,7 @@ const renderComments = (comments, deletingComments = [], isOnline) => {
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
                   <span class="film-details__comment-day">${formatDateTime(date)}</span>
-                  ${isOnline ? 
-                      `<button class="film-details__comment-delete" data-id="${id}" ${deletingComments.indexOf(id) > -1 ? `disabled` : ``}>${deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`}</button>` 
-                    : ``}
+                  ${isOnline ? `<button class="film-details__comment-delete" data-id="${id}" ${deletingComments.indexOf(id) > -1 ? `disabled` : ``}>${deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`}</button>` : ``}
                 </p>
               </div>
             </li>`;
@@ -118,8 +116,7 @@ const createFilmDetailsTemplate = (film, comments, deletingComments) => {
           
                   ${comments.length > 0 ? renderComments(comments, deletingComments, isOnline) : ``}
           
-                  ${isOnline ? 
-                  `<div class="film-details__new-comment">
+                  ${isOnline ? `<div class="film-details__new-comment">
                     <div for="add-emoji" class="film-details__add-emoji-label"></div>
           
                     <label class="film-details__comment-label">
