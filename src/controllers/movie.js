@@ -26,6 +26,7 @@ export default class MovieController {
   constructor(container, onDataChange, commentsModel, api) {
     this._container = container;
     this._api = api;
+    this._isOnline = this._api.isOnline();
     this._onDataChange = onDataChange;
     this._mode = Mode.DEFAULT;
     this._filmComponent = null;
@@ -158,6 +159,10 @@ export default class MovieController {
 
   _onFilmElementClick() {
     this._mode = Mode.EDIT;
+    if (this._isOnline !== this._api.isOnline()) {
+      this._isOnline = this._api.isOnline();
+      this._filmDetailsComponent.rerender();
+    }
     toggleElement(this._footerElement, this._filmDetailsComponent, `show`);
     document.addEventListener(`keydown`, this._onEscapeKeyPress);
   }

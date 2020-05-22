@@ -1,16 +1,16 @@
-const POSITION = {
+export const POSITION = {
   AFTERBEGIN: `afterbegin`,
   AFTEREND: `afterend`,
   BEFOREEND: `beforeend`
 };
 
-const createElement = (template) => {
+export const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
   return newElement.firstChild;
 };
 
-const render = (container, component, position) => {
+export const render = (container, component, position) => {
   const element = component.getElement();
   switch (position) {
     case POSITION.AFTERBEGIN:
@@ -25,12 +25,12 @@ const render = (container, component, position) => {
   }
 };
 
-const remove = (component) => {
+export const remove = (component) => {
   component.getElement().remove();
   component.removeElement();
 };
 
-const toggleElement = (container, component, action) => {
+export const toggleElement = (container, component, action) => {
   const element = component.getElement();
   switch (action) {
     case `show`:
@@ -44,7 +44,7 @@ const toggleElement = (container, component, action) => {
   }
 };
 
-const replace = (oldComponent, newComponent) => {
+export const replace = (oldComponent, newComponent) => {
   const parentElement = oldComponent.getElement().parentElement;
   const newElement = newComponent.getElement();
   const oldElement = oldComponent.getElement();
@@ -55,5 +55,3 @@ const replace = (oldComponent, newComponent) => {
     parentElement.replaceChild(newElement, oldElement);
   }
 };
-
-export {createElement, render, POSITION, remove, toggleElement, replace};

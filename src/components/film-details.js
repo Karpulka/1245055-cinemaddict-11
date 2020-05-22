@@ -36,7 +36,7 @@ const renderGenres = (genres) => {
     .join(`\n`);
 };
 
-const renderComments = (comments, deletingComments = []) => {
+const renderComments = (comments, deletingComments = [], isOnline) => {
   const result = comments.map((comment) => {
     const {comment: commentText, emotion, author, date, id} = comment;
     return `<li class="film-details__comment">
@@ -48,7 +48,7 @@ const renderComments = (comments, deletingComments = []) => {
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
                   <span class="film-details__comment-day">${formatDateTime(date)}</span>
-                  <button class="film-details__comment-delete" data-id="${id}" ${deletingComments.indexOf(id) > -1 ? `disabled` : ``}>${deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`}</button>
+                  ${isOnline ? `<button class="film-details__comment-delete" data-id="${id}" ${deletingComments.indexOf(id) > -1 ? `disabled` : ``}>${deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`}</button>` : ``}
                 </p>
               </div>
             </li>`;
@@ -58,7 +58,7 @@ const renderComments = (comments, deletingComments = []) => {
 
 const createFilmDetailsTemplate = (film, comments, deletingComments) => {
   const {name, originalName, rating, genres, description, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
-
+  const isOnline = window.navigator.onLine;
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
               <div class="form-details__top-container">
@@ -114,9 +114,9 @@ const createFilmDetailsTemplate = (film, comments, deletingComments) => {
                 <section class="film-details__comments-wrap">
                   <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
           
-                  ${comments.length > 0 ? renderComments(comments, deletingComments) : ``}
+                  ${comments.length > 0 ? renderComments(comments, deletingComments, isOnline) : ``}
           
-                  <div class="film-details__new-comment">
+                  ${isOnline ? `<div class="film-details__new-comment">
                     <div for="add-emoji" class="film-details__add-emoji-label"></div>
           
                     <label class="film-details__comment-label">
@@ -144,7 +144,7 @@ const createFilmDetailsTemplate = (film, comments, deletingComments) => {
                         <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
                       </label>
                     </div>
-                  </div>
+                  </div>` : ``}
                 </section>
               </div>
             </form>

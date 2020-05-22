@@ -1,5 +1,5 @@
-import FilmModel from "./models/film";
-import CommentModel from "./models/comment";
+import FilmModel from "../models/film";
+import CommentModel from "../models/comment";
 
 const Method = {
   GET: `GET`,
@@ -61,6 +61,16 @@ export default class API {
     })
       .then((response) => response.json())
       .then((movieInfo) => CommentModel.parseComments(movieInfo.comments));
+  }
+
+  sync(data) {
+    return this._load({
+      url: `movies/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then((response) => response.json());
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
