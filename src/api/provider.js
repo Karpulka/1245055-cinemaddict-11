@@ -86,7 +86,7 @@ export default class Provider {
     if (this.isOnline()) {
       return this._api.addComment(filmId, comment)
         .then((comments) => {
-          const addedComment = comments.find((comment) =>  Object.values(this._store.getItems().comments).findIndex((item) => item.id === comment.id) === -1);
+          const addedComment = comments.find((commentItem) => Object.values(this._store.getItems().comments).findIndex((item) => item.id === commentItem.id) === -1);
 
           this._store.setComment(addedComment.id, addedComment);
 

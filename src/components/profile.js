@@ -28,11 +28,7 @@ export default class Profile extends AbstractSmartComponent {
   }
 
   _getProfileRating() {
-    if (this._watchedFilmsCount === 0) {
-      return ProfileRating.DEFAULT;
-    }
-
-    if (this._watchedFilmsCount > 0 && this._watchedFilmsCount <= 10 ) {
+    if (this._watchedFilmsCount > 0 && this._watchedFilmsCount <= 10) {
       return ProfileRating.NOVICE;
     }
 
@@ -43,6 +39,8 @@ export default class Profile extends AbstractSmartComponent {
     if (this._watchedFilmsCount > 20) {
       return ProfileRating.MOVIE_BUFF;
     }
+
+    return ProfileRating.DEFAULT;
   }
 
   recoveryListeners() {}
