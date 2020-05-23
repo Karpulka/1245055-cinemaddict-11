@@ -12,35 +12,35 @@ export const getFilmsSortByCommentsCount = (films, from, to) => {
   }).slice(from, to);
 };
 
-export const parseDataForUpdate = (data) => {
-  const releaseDate = data.details.find((item) => item.term === `Release Date`).info;
-  const writers = data.details.find((item) => item.term === `Writers`).info;
-  const actors = data.details.find((item) => item.term === `Actors`).info;
+export const parseFilmForUpdate = (film) => {
+  const releaseDate = film.details.find((item) => item.term === `Release Date`).info;
+  const writers = film.details.find((item) => item.term === `Writers`).info;
+  const actors = film.details.find((item) => item.term === `Actors`).info;
   return {
-    "id": data.id,
-    "comments": data.comments,
+    "id": film.id,
+    "comments": film.comments,
     "film_info": {
-      "title": data.name,
-      "alternative_title": data.originalName,
-      "total_rating": data.rating,
-      "poster": data.poster,
-      "age_rating": data.age,
-      "director": data.details.find((item) => item.term === `Director`).info,
+      "title": film.name,
+      "alternative_title": film.originalName,
+      "total_rating": film.rating,
+      "poster": film.poster,
+      "age_rating": film.age,
+      "director": film.details.find((item) => item.term === `Director`).info,
       "writers": writers ? writers.split(`, `) : [],
       "actors": actors ? actors.split(`, `) : [],
       "release": {
         "date": releaseDate ? releaseDate.toISOString() : null,
-        "release_country": data.details.find((item) => item.term === `Country`).info
+        "release_country": film.details.find((item) => item.term === `Country`).info
       },
-      "runtime": data.details.find((item) => item.term === `Runtime`).info,
-      "genre": data.genres ? data.genres.split(`, `) : [],
-      "description": data.description
+      "runtime": film.details.find((item) => item.term === `Runtime`).info,
+      "genre": film.genres ? film.genres.split(`, `) : [],
+      "description": film.description
     },
     "user_details": {
-      "watchlist": data.isWatchlist,
-      "already_watched": data.isWatched,
-      "watching_date": data.watchingDate ? data.watchingDate.toISOString() : null,
-      "favorite": data.isFavorites
+      "watchlist": film.isWatchlist,
+      "already_watched": film.isWatched,
+      "watching_date": film.watchingDate ? film.watchingDate.toISOString() : null,
+      "favorite": film.isFavorites
     }
   };
 };

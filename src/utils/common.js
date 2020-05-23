@@ -2,18 +2,8 @@ import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
 momentDurationFormatSetup(moment);
 
-export const getRandomNumber = (min, max) => {
-  return Math.floor(Math.random() * (max - min)) + min;
-};
-
-export const getRandomItemFromArray = (array) => {
-  const min = 0;
-  const max = array.length;
-  return array[getRandomNumber(min, max)];
-};
-
-export const formatDateTime = (date) => {
-  return moment(date).format(`YYYY/MM/DD hh:mm`);
+export const formatDateToFromNow = (date) => {
+  return moment(date).fromNow();
 };
 
 export const formatFilmDuration = (movieDuration) => {

@@ -21,12 +21,16 @@ export default class Movies {
       case FilterTypes.WATCHLIST:
         return this._films.filter((elm) => elm.isWatchlist);
       case FilterTypes.HISTORY:
-        return this._films.filter((elm) => elm.isWatched);
+        return this.getWatchedFilms();
       case FilterTypes.FAVORITES:
         return this._films.filter((elm) => elm.isFavorites);
     }
 
     return this._films;
+  }
+
+  getWatchedFilms() {
+    return this._films.filter((elm) => elm.isWatched);
   }
 
   updateData(id, newFilm) {

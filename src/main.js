@@ -1,8 +1,6 @@
 import API from "./api/api";
 import Store from "./api/store";
 import Provider from "./api/provider";
-import Profile from "./components/profile";
-import {render, POSITION} from "./utils/render";
 import PageController from "./controllers/page";
 import Movies from "./models/movies";
 import Comments from "./models/comments";
@@ -29,9 +27,6 @@ const renderPage = (movies = [], comments = []) => {
   footerElement.querySelector(`.footer__statistics`).textContent = `${films.length} movies inside`;
 };
 
-const headerElement = document.querySelector(`.header`);
-render(headerElement, new Profile(), POSITION.BEFOREEND);
-
 apiWithProvider.getFilms()
   .then((loadedFilms) => {
     films = loadedFilms;
@@ -39,7 +34,12 @@ apiWithProvider.getFilms()
   })
   .then((commentPromises) => Promise.all(commentPromises))
   .then((comments) => {
-    const allComments = comments.reduce((concatComments, item) => concatComments.concat(item), []);
+    let allComments = [];
+    if (apiWithProvider.isOnline()) {
+      allComments = comments.reduce((concatComments, item) => concatComments.concat(item), []);
+    } else {
+      allComments = comments;
+    }
 
     renderPage(films, allComments);
   })
@@ -49,11 +49,8 @@ apiWithProvider.getFilms()
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {
-      // Действие, в случае успешной регистрации ServiceWorker
-    }).catch(() => {
-    // Действие, в случае ошибки при регистрации ServiceWorker
-  });
+    .then(() => {})
+    .catch(() => {});
 });
 
 window.addEventListener(`online`, () => {

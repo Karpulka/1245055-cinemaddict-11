@@ -1,4 +1,4 @@
-import {formatDateTime, formatFilmDuration, formatFilmReleaseDate} from "../utils/common";
+import {formatDateToFromNow, formatFilmDuration, formatFilmReleaseDate} from "../utils/common";
 import AbstractSmartComponent from "./abstract-smart-component";
 import {encode} from "he";
 
@@ -47,7 +47,7 @@ const renderComments = (comments, deletingComments = [], isOnline) => {
                 <p class="film-details__comment-text">${encode(commentText)}</p>
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
-                  <span class="film-details__comment-day">${formatDateTime(date)}</span>
+                  <span class="film-details__comment-day">${formatDateToFromNow(date)}</span>
                   ${isOnline ? `<button class="film-details__comment-delete" data-id="${id}" ${deletingComments.indexOf(id) > -1 ? `disabled` : ``}>${deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`}</button>` : ``}
                 </p>
               </div>
@@ -59,6 +59,7 @@ const renderComments = (comments, deletingComments = [], isOnline) => {
 const createFilmDetailsTemplate = (film, comments, deletingComments) => {
   const {name, originalName, rating, genres, description, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
   const isOnline = window.navigator.onLine;
+
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
               <div class="form-details__top-container">
@@ -87,7 +88,7 @@ const createFilmDetailsTemplate = (film, comments, deletingComments) => {
                     <table class="film-details__table">
                       ${renderFilmDetailsRow(details)}
                       <tr class="film-details__row">
-                        <td class="film-details__term">${genres.length > 1 ? `Genres` : `Genre`}</td>
+                        <td class="film-details__term">${genres.split(`, `).length > 1 ? `Genres` : `Genre`}</td>
                         <td class="film-details__cell">${renderGenres(genres)}</td>
                       </tr>
                     </table>

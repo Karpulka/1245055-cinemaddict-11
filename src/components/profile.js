@@ -1,14 +1,53 @@
-import AbstractComponent from "./abstract-component";
+import AbstractSmartComponent from "./abstract-smart-component";
 
-const createProfileTemplate = () => {
+const ProfileRating = {
+  DEFAULT: null,
+  NOVICE: `Novice`,
+  FAN: `Fan`,
+  MOVIE_BUFF: `Movie Buff`
+};
+
+const createProfileTemplate = (profileRating) => {
   return `<section class="header__profile profile">
-            <p class="profile__rating">Movie Buff</p>
+            ${profileRating ? `<p class="profile__rating">${profileRating}</p>` : ``}
             <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
           </section>`;
 };
 
-export default class Profile extends AbstractComponent {
+export default class Profile extends AbstractSmartComponent {
+  constructor(moviesModel) {
+    super();
+
+    this._moviewModel = moviesModel;
+    this._watchedFilmsCount = this._moviewModel.getWatchedFilms().length;
+    this._profileRating = this._getProfileRating();
+  }
+
   getTemplate() {
-    return createProfileTemplate();
+    return createProfileTemplate(this._profileRating);
+  }
+
+  _getProfileRating() {
+    if (this._watchedFilmsCount > 0 && this._watchedFilmsCount <= 10) {
+      return ProfileRating.NOVICE;
+    }
+
+    if (this._watchedFilmsCount > 10 && this._watchedFilmsCount <= 20) {
+      return ProfileRating.FAN;
+    }
+
+    if (this._watchedFilmsCount > 20) {
+      return ProfileRating.MOVIE_BUFF;
+    }
+
+    return ProfileRating.DEFAULT;
+  }
+
+  recoveryListeners() {}
+
+  rerender() {
+    this._watchedFilmsCount = this._moviewModel.getWatchedFilms().length;
+    this._profileRating = this._getProfileRating();
+    super.rerender();
   }
 }
