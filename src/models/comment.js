@@ -1,10 +1,10 @@
 export default class CommentModel {
-  constructor(data) {
-    this.id = data[`id`];
-    this.author = data[`author`];
-    this.comment = data[`comment`];
-    this.date = data[`date`] ? new Date(data[`date`]) : null;
-    this.emotion = data[`emotion`];
+  constructor(comment) {
+    this.id = comment[`id`];
+    this.author = comment[`author`];
+    this.comment = comment[`comment`];
+    this.date = comment[`date`] ? new Date(comment[`date`]) : null;
+    this.emotion = comment[`emotion`];
   }
 
   toRAW() {
@@ -15,11 +15,11 @@ export default class CommentModel {
     };
   }
 
-  static parseComment(data) {
-    return new CommentModel(data);
+  static parseComment(comment) {
+    return new CommentModel(comment);
   }
 
-  static parseComments(data) {
-    return data.map(CommentModel.parseComment);
+  static parseComments(comment) {
+    return comment.map(CommentModel.parseComment);
   }
 }

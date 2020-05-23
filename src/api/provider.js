@@ -41,7 +41,7 @@ export default class Provider {
         .then((comments) => {
           const items = createStoreStructure(comments);
 
-          this._store.setComments(filmId, items);
+          this._store.setComments(items);
 
           return comments;
         });
@@ -49,7 +49,7 @@ export default class Provider {
 
     const storeComments = Object.values(this._store.getItems().comments);
 
-    return Promise.resolve(CommentModel.parseComments(Object.values(storeComments[filmId])));
+    return Promise.resolve(CommentModel.parseComments(Object.values(storeComments)));
   }
 
   updateFilm(id, film) {
@@ -82,11 +82,13 @@ export default class Provider {
     return Promise.resolve();
   }
 
-  addComment(filmId, data) {
+  addComment(filmId, comment) {
     if (this.isOnline()) {
-      return this._api.addComment(filmId, data)
+      return this._api.addComment(filmId, comment)
         .then((comments) => {
-          this._store.setComment(filmId, comments);
+          const addedComment = comments.find((comment) =>  Object.values(this._store.getItems().comments).findIndex((item) => item.id === comment.id) === -1);
+
+          this._store.setComment(addedComment.id, addedComment);
 
           return comments;
         });

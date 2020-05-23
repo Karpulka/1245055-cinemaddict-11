@@ -8,7 +8,8 @@ import {renderFilms} from "./movie";
 import FilterController, {FilterTypes} from "./filter";
 import AdditionBlockController from "./addition-block";
 import Staistic from "../components/statistic";
-import {parseDataForUpdate} from "../utils/film";
+import {parseFilmForUpdate} from "../utils/film";
+import Profile from "../components/profile";
 
 const FILM_PAGE_COUNT = 5;
 
@@ -42,9 +43,13 @@ export default class PageController {
     this._additionBlockController = null;
     this._statisticComponent = new Staistic(moviesModel);
     this._statisticComponent.hide();
+    this._profileComponent = new Profile(this._moviesModel);
   }
 
   render() {
+    const headerElement = document.querySelector(`.header`);
+
+    render(headerElement, this._profileComponent, POSITION.BEFOREEND);
     this._films = this._moviesModel.getFilms();
     this._filtersController.render();
     render(this._container, this._sort, POSITION.BEFOREEND);
@@ -113,16 +118,16 @@ export default class PageController {
     });
   }
 
-  _onDataChange(oldData, newData) {
-    if (newData) {
-      this._api.updateFilm(oldData.id, new FilmModel(parseDataForUpdate(newData)))
+  _onDataChange(oldFilm, newFilm) {
+    if (newFilm) {
+      this._api.updateFilm(oldFilm.id, new FilmModel(parseFilmForUpdate(newFilm)))
         .then((filmModel) => {
           this._updateFilmsAfterRequests(filmModel);
         });
     } else {
       this._api.getFilms()
         .then((filmModels) => {
-          const filmModel = filmModels.find((film) => film.id === oldData.id);
+          const filmModel = filmModels.find((film) => film.id === oldFilm.id);
           this._updateFilmsAfterRequests(filmModel);
         });
     }
@@ -134,6 +139,7 @@ export default class PageController {
     const filmControllers = this._showingFilms.filter((filmController) => filmController.film.id === film.id);
     filmControllers.forEach((filmController) => filmController.render(film));
 
+    this._profileComponent.rerender();
     this._filtersController.render();
     this._statisticComponent.rerender();
     this._statisticComponent.hide();

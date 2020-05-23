@@ -34,11 +34,11 @@ export default class API {
       .then(CommentModel.parseComments);
   }
 
-  updateFilm(id, data) {
+  updateFilm(id, film) {
     return this._load({
       url: `movies/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data.toRAW()),
+      body: JSON.stringify(film.toRAW()),
       headers: new Headers({"Content-Type": `application/json`})
     })
       .then((response) => response.json())
@@ -52,22 +52,22 @@ export default class API {
     });
   }
 
-  addComment(filmId, data) {
+  addComment(filmId, comment) {
     return this._load({
       url: `comments/${filmId}`,
       method: Method.POST,
-      body: JSON.stringify(data.toRAW()),
+      body: JSON.stringify(comment.toRAW()),
       headers: new Headers({"Content-Type": `application/json`})
     })
       .then((response) => response.json())
       .then((movieInfo) => CommentModel.parseComments(movieInfo.comments));
   }
 
-  sync(data) {
+  sync(films) {
     return this._load({
       url: `movies/sync`,
       method: Method.POST,
-      body: JSON.stringify(data),
+      body: JSON.stringify(films),
       headers: new Headers({"Content-Type": `application/json`})
     })
       .then((response) => response.json());

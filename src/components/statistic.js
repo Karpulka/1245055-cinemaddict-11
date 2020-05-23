@@ -216,7 +216,7 @@ export default class Staistic extends AbstractSmartComponent {
     this._favoriteGenre = null;
     this._sumDuration = 0;
     this._sortedWatchedFilms = [];
-    this._watchedFilms = this._moviesModel.getAllFilms().filter((film) => film.isWatched);
+    this._watchedFilms = this._moviesModel.getWatchedFilms();
 
     if (this._statisticChart) {
       this._statisticChart.destroy();
