@@ -50,4 +50,8 @@ export default class Profile extends AbstractSmartComponent {
     this._profileRating = this._getProfileRating();
     super.rerender();
   }
+
+  getCurrentProfileRating() {
+    return this._profileRating;
+  }
 }

@@ -80,11 +80,12 @@ const formatDate = (date) => {
   return moment(date).format(`YYYY/MM/DD`);
 };
 
-const createStatisticTemplate = (watchedFilmsCount, sumDuration, favoriteGenre, filterType) => {
+const createStatisticTemplate = (options = {}) => {
+  const {watchedFilmsCount, sumDuration, favoriteGenre, filterType, profileRating} = options;
   const time = formatFilmDurationForStatistic(sumDuration).split(`:`);
   return `<section class="statistic">
     <p class="statistic__rank">
-      Your rank
+      ${profileRating}
       <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
       <span class="statistic__rank-label">Sci-Fighter</span>
     </p>
@@ -130,8 +131,8 @@ const createStatisticTemplate = (watchedFilmsCount, sumDuration, favoriteGenre, 
   </section>`;
 };
 
-export default class Staistic extends AbstractSmartComponent {
-  constructor(moviesModel) {
+export default class Statistic extends AbstractSmartComponent {
+  constructor(moviesModel, profileComponent) {
     super();
     this._moviesModel = moviesModel;
     this._statisticChart = null;
@@ -144,10 +145,18 @@ export default class Staistic extends AbstractSmartComponent {
     this._sumDuration = 0;
     this._currentFilterType = FilterTypes.ALL_TIME;
     this._onChangeFilter = this._onChangeFilter.bind(this);
+    this._profileComponent = profileComponent;
   }
 
   getTemplate() {
-    return createStatisticTemplate(this._sortedWatchedFilms.length, this._sumDuration, this._favoriteGenre, this._currentFilterType);
+    const options = {
+      watchedFilmsCount: this._sortedWatchedFilms.length,
+      sumDuration: this._sumDuration,
+      favoriteGenre: this._favoriteGenre,
+      filterType: this._currentFilterType,
+      profileRating: this._profileComponent.getCurrentProfileRating()
+    }
+    return createStatisticTemplate(options);
   }
 
   show() {

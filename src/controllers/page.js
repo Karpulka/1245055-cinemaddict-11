@@ -7,7 +7,7 @@ import ContentBlock from "../components/content-block";
 import {renderFilms} from "./movie";
 import FilterController, {FilterTypes} from "./filter";
 import AdditionBlockController from "./addition-block";
-import Staistic from "../components/statistic";
+import Statistic from "../components/statistic";
 import {parseFilmForUpdate} from "../utils/film";
 import Profile from "../components/profile";
 
@@ -41,9 +41,9 @@ export default class PageController {
     this._filmListContainerElement = null;
     this._filmContainerElement = null;
     this._additionBlockController = null;
-    this._statisticComponent = new Staistic(moviesModel);
-    this._statisticComponent.hide();
     this._profileComponent = new Profile(this._moviesModel);
+    this._statisticComponent = new Statistic(moviesModel, this._profileComponent);
+    this._statisticComponent.hide();
   }
 
   render() {
