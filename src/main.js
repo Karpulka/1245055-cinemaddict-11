@@ -36,7 +36,7 @@ render(mainContainerElement, loadComponent, POSITION.BEFOREEND);
 apiWithProvider.getFilms()
   .then((loadedFilms) => {
     films = loadedFilms;
-    return films.map((film) => apiWithProvider.loadComments(film.id))
+    return films.map((film) => apiWithProvider.loadComments(film.id));
   })
   .then((commentPromises) => Promise.all(commentPromises))
   .then((comments) => {
