@@ -88,7 +88,7 @@ export default class PageController {
   }
 
   _renderLoadMoreButton() {
-    if (this._filtersController.getCurrentFilterTypeFilmsCount() <= FILM_PAGE_COUNT) {
+    if (this._filtersController.getCurrentFilterTypeFilmsCount() <= FILM_PAGE_COUNT || this._showingFilmsCount === this._filtersController.getCurrentFilterTypeFilmsCount()) {
       return;
     }
     render(this._filmListContainerElement, this._moreButton, POSITION.AFTEREND);
@@ -142,6 +142,7 @@ export default class PageController {
     this._profileComponent.rerender();
     this._filtersController.render();
     this._statisticComponent.rerender();
+    this._updateFilms(false);
     this._statisticComponent.hide();
   }
 
@@ -158,7 +159,7 @@ export default class PageController {
     this._updateFilms();
   }
 
-  _updateFilms(resetShoingFilmsCount = true) {
+  _updateFilms(resetShowingFilmsCount = true) {
     if (this._filtersController.getCurrentFilterType() === FilterTypes.STATISTIC) {
       this._sort.hide();
       this._hide();
@@ -167,11 +168,17 @@ export default class PageController {
       this._sort.setDefaultSortType();
       this._removeFilms();
       this._films = this._moviesModel.getFilms();
-      const showingFilmsCount = resetShoingFilmsCount ? FILM_PAGE_COUNT : this._showingFilmsCount;
-      const showingFilms = renderFilms(this._filmListContainerElement, this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, showingFilmsCount), this._onDataChange, this._commentsModel, this._api);
-      this._showingFilms = this._showingFilms.concat(showingFilms);
-      this._showingFilmsCount = showingFilms.length;
-      this._renderLoadMoreButton();
+      const showingFilmsCount = resetShowingFilmsCount ? FILM_PAGE_COUNT : this._showingFilmsCount;
+      const filmsForShow = this._moviesModel.getSortedFilms(this._sort.getCurrentSortType(), 0, showingFilmsCount);
+
+      if (filmsForShow.length > 0) {
+        const showingFilms = renderFilms(this._filmListContainerElement, filmsForShow, this._onDataChange, this._commentsModel, this._api);
+        this._showingFilms = this._showingFilms.concat(showingFilms);
+        this._showingFilmsCount = showingFilms.length;
+        this._renderLoadMoreButton();
+      } else {
+        render(this._filmContainerElement.querySelector(`.films-list`), this._noFilm, POSITION.BEFOREEND);
+      }
       this._statisticComponent.hide();
       this._sort.show();
       this._show();
