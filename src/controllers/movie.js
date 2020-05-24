@@ -80,6 +80,12 @@ export default class MovieController {
     }
   }
 
+  destroy() {
+    remove(this._filmComponent);
+    remove(this._filmDetailsComponent);
+    document.removeEventListener(`keydown`, this._onEscapeKeyPress);
+  }
+
   _setAddToWatchlist() {
     this._onDataChange(this._film, Object.assign({}, this._film, {
       isWatchlist: !this._film.isWatchlist
@@ -195,11 +201,5 @@ export default class MovieController {
         this._filmDetailsComponent.removeDeleteCommentID(id);
         this._filmDetailsComponent.setDeleteCommentErrorStyles(id);
       });
-  }
-
-  destroy() {
-    remove(this._filmComponent);
-    remove(this._filmDetailsComponent);
-    document.removeEventListener(`keydown`, this._onEscapeKeyPress);
   }
 }

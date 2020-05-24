@@ -155,7 +155,7 @@ export default class Statistic extends AbstractSmartComponent {
       favoriteGenre: this._favoriteGenre,
       filterType: this._currentFilterType,
       profileRating: this._profileComponent.getCurrentProfileRating()
-    }
+    };
     return createStatisticTemplate(options);
   }
 

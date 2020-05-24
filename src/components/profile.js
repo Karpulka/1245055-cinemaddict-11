@@ -27,6 +27,18 @@ export default class Profile extends AbstractSmartComponent {
     return createProfileTemplate(this._profileRating);
   }
 
+  rerender() {
+    this._watchedFilmsCount = this._moviewModel.getWatchedFilms().length;
+    this._profileRating = this._getProfileRating();
+    super.rerender();
+  }
+
+  getCurrentProfileRating() {
+    return this._profileRating;
+  }
+
+  recoveryListeners() {}
+
   _getProfileRating() {
     if (this._watchedFilmsCount > 0 && this._watchedFilmsCount <= 10) {
       return ProfileRating.NOVICE;
@@ -41,17 +53,5 @@ export default class Profile extends AbstractSmartComponent {
     }
 
     return ProfileRating.DEFAULT;
-  }
-
-  recoveryListeners() {}
-
-  rerender() {
-    this._watchedFilmsCount = this._moviewModel.getWatchedFilms().length;
-    this._profileRating = this._getProfileRating();
-    super.rerender();
-  }
-
-  getCurrentProfileRating() {
-    return this._profileRating;
   }
 }

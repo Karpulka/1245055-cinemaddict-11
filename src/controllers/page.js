@@ -128,12 +128,12 @@ export default class PageController {
       this._api.getFilms()
         .then((filmModels) => {
           const filmModel = filmModels.find((film) => film.id === oldFilm.id);
-          this._updateFilmsAfterRequests(filmModel);
+          this._updateFilmsAfterRequests(filmModel, true);
         });
     }
   }
 
-  _updateFilmsAfterRequests(film) {
+  _updateFilmsAfterRequests(film, isCommentDelete = false) {
     this._moviesModel.updateData(film.id, film);
 
     const filmControllers = this._showingFilms.filter((filmController) => filmController.film.id === film.id);
@@ -142,7 +142,9 @@ export default class PageController {
     this._profileComponent.rerender();
     this._filtersController.render();
     this._statisticComponent.rerender();
-    this._updateFilms(false);
+    if (!isCommentDelete) {
+      this._updateFilms(false);
+    }
     this._statisticComponent.hide();
   }
 

@@ -12,9 +12,9 @@ export default class Store {
     }
   }
 
-  setFilms(items) {
+  setFilms(films) {
     const store = this.getItems();
-    const newStore = {films: items, comments: store.comments ? store.comments : {}};
+    const newStore = {films, comments: store.comments ? store.comments : {}};
 
     this._storage.setItem(this._storeKey, JSON.stringify(newStore));
   }

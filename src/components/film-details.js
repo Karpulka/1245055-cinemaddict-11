@@ -39,6 +39,9 @@ const renderGenres = (genres) => {
 const renderComments = (comments, deletingComments = [], isOnline) => {
   const result = comments.map((comment) => {
     const {comment: commentText, emotion, author, date, id} = comment;
+    const disable = deletingComments.indexOf(id) > -1 ? `disabled` : ``;
+    const deleteButtonText = deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`;
+
     return `<li class="film-details__comment">
               <span class="film-details__comment-emoji">
                 <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
@@ -48,7 +51,7 @@ const renderComments = (comments, deletingComments = [], isOnline) => {
                 <p class="film-details__comment-info">
                   <span class="film-details__comment-author">${author}</span>
                   <span class="film-details__comment-day">${formatDateToFromNow(date)}</span>
-                  ${isOnline ? `<button class="film-details__comment-delete" data-id="${id}" ${deletingComments.indexOf(id) > -1 ? `disabled` : ``}>${deletingComments.indexOf(id) > -1 ? `Deleting...` : `Delete`}</button>` : ``}
+                  ${isOnline ? `<button class="film-details__comment-delete" data-id="${id}" ${disable}>${deleteButtonText}</button>` : ``}
                 </p>
               </div>
             </li>`;
@@ -57,7 +60,19 @@ const renderComments = (comments, deletingComments = [], isOnline) => {
 };
 
 const createFilmDetailsTemplate = (film, comments, deletingComments) => {
-  const {name, originalName, rating, genres, description, poster, age, details, isWatchlist, isWatched, isFavorites} = film;
+  const {
+    name,
+    originalName,
+    rating,
+    genres,
+    description,
+    poster,
+    age,
+    details,
+    isWatchlist,
+    isWatched,
+    isFavorites
+  } = film;
   const isOnline = window.navigator.onLine;
 
   return `<section class="film-details">
@@ -161,23 +176,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._setFilterInputHandler = null;
     this._deleteButtonHandler = null;
     this._deletingComments = [];
-  }
-
-  rerender() {
-    super.rerender();
-  }
-
-  reset() {
-    const emoji = this.getElement().querySelector(`.film-details__new-comment .film-details__add-emoji-label img`);
-    const commentText = this.getElement().querySelector(`.film-details__comment-input`);
-    if (emoji) {
-      emoji.remove();
-    }
-    if (commentText) {
-      commentText.value = ``;
-    }
-
-    this.rerender();
+    this._formElements = this.getElement().querySelectorAll(`form input, form textarea, form button`);
   }
 
   getTemplate() {
@@ -197,26 +196,40 @@ export default class FilmDetails extends AbstractSmartComponent {
     }
   }
 
-  setCloseClickHandler(handler) {
-    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
-    this._closeClickHandler = handler;
+  rerender() {
+    super.rerender();
+  }
+
+  reset() {
+    const emojiElement = this.getElement().querySelector(`.film-details__new-comment .film-details__add-emoji-label img`);
+    const commentTextElement = this.getElement().querySelector(`.film-details__comment-input`);
+    if (emojiElement) {
+      emojiElement.remove();
+    }
+    if (commentTextElement) {
+      commentTextElement.value = ``;
+    }
+
+    this.rerender();
   }
 
   setFormElementsChangeHandler() {
     this.getElement().querySelectorAll(`[name="comment-emoji"]`).forEach((emotion) => {
       emotion.addEventListener(`change`, (evt) => {
-        if (evt.target.value) {
+        const emotionValue = evt.target.value;
+        if (emotionValue) {
           const forNewEmojiElement = this.getElement().querySelector(`.film-details__new-comment .film-details__add-emoji-label`);
-          if (!forNewEmojiElement.querySelector(`img`)) {
+          const forNewEmojiImageElement = forNewEmojiElement.querySelector(`img`);
+          if (!forNewEmojiImageElement) {
             const newEmoji = document.createElement(`img`);
-            newEmoji.src = `${EMOJI_PATH}${evt.target.value}.png`;
-            newEmoji.alt = `emoji-${evt.target.value}`;
+            newEmoji.src = `${EMOJI_PATH}${emotionValue}.png`;
+            newEmoji.alt = `emoji-${emotionValue}`;
             newEmoji.width = `55`;
             newEmoji.height = `55`;
             forNewEmojiElement.append(newEmoji);
           } else {
-            forNewEmojiElement.querySelector(`img`).src = `${EMOJI_PATH}${evt.target.value}.png`;
-            forNewEmojiElement.querySelector(`img`).alt = `emoji-${evt.target.value}`;
+            forNewEmojiImageElement.src = `${EMOJI_PATH}${emotionValue}.png`;
+            forNewEmojiImageElement.alt = `emoji-${emotionValue}`;
           }
         }
       });
@@ -244,12 +257,17 @@ export default class FilmDetails extends AbstractSmartComponent {
     this.setDeleteCommentButtonClickHandler(this._deleteButtonHandler);
   }
 
+  setCloseClickHandler(handler) {
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
+    this._closeClickHandler = handler;
+  }
+
   disableForm() {
-    this.getElement().querySelectorAll(`form input, form textarea, form button`).forEach((formElement) => formElement.setAttribute(`disabled`, `disabled`));
+    this._formElements.forEach((formElement) => formElement.setAttribute(`disabled`, `disabled`));
   }
 
   activateForm() {
-    this.getElement().querySelectorAll(`form input, form textarea, form button`).forEach((formElement) => formElement.removeAttribute(`disabled`));
+    this._formElements.forEach((formElement) => formElement.removeAttribute(`disabled`));
   }
 
   setSendFormErrorStyles() {
@@ -272,6 +290,6 @@ export default class FilmDetails extends AbstractSmartComponent {
     if (this.getElement().classList.contains(`shake`)) {
       this.getElement().classList.remove(`shake`);
     }
-    this.getElement().querySelector(`.film-details__comment-input`).style.border = `0`;
+    this.getElement().querySelector(`.film-details__comment-input`).style.border = 0;
   }
 }

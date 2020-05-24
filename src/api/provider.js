@@ -15,10 +15,6 @@ export default class Provider {
     this._store = store;
   }
 
-  isOnline() {
-    return window.navigator.onLine;
-  }
-
   getFilms() {
     if (this.isOnline()) {
       return this._api.getFilms()
@@ -33,6 +29,10 @@ export default class Provider {
     const storeFilms = Object.values(this._store.getItems().films);
 
     return Promise.resolve(FilmModel.parseFilms(storeFilms));
+  }
+
+  isOnline() {
+    return window.navigator.onLine;
   }
 
   loadComments(filmId) {

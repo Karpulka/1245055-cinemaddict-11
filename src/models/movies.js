@@ -72,14 +72,6 @@ export default class Movies {
     this._dataCommentsChangeHandlers.push(handler);
   }
 
-  _callHandlers(handlers) {
-    handlers.forEach((handler) => handler());
-  }
-
-  _getFilmsSortByRating(from, to) {
-    return getFilmsSortByRating(this.getFilms(), from, to);
-  }
-
   getSortedFilms(sortType, from, to) {
     switch (sortType) {
       case SORT_TYPE.DATE:
@@ -94,5 +86,13 @@ export default class Movies {
         return this.getFilms().slice(from, to);
     }
     return [];
+  }
+
+  _callHandlers(handlers) {
+    handlers.forEach((handler) => handler());
+  }
+
+  _getFilmsSortByRating(from, to) {
+    return getFilmsSortByRating(this.getFilms(), from, to);
   }
 }
