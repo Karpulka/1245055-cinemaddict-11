@@ -133,6 +133,7 @@ export default class MovieController {
 
   _onSubmitForm(evt) {
     evt.preventDefault();
+
     this._filmDetailsComponent.removeSendFormErrorStyles();
     const commentText = this._filmDetailsComponent.getElement().querySelector(`.film-details__comment-input`).value;
     const emoji = this._filmDetailsComponent.getElement().querySelector(`[name="comment-emoji"]:checked`);
@@ -216,7 +217,12 @@ export default class MovieController {
     this._api.deleteComment(id)
       .then(() => {
         this._filmCommentsModel.deleteComment(id);
-        this._onDataChange(this._film, null);
+        const index = this._updatedFilm.comments.indexOf(id);
+        if (index > -1) {
+          this._updatedFilm.comments.splice(index, 1);
+        }
+        this._filmDetailsComponent.removeDeleteCommentID(id);
+        document.addEventListener(`keydown`, this._onEscapeKeyPress);
       })
       .catch(() => {
         this._filmDetailsComponent.removeDeleteCommentID(id);
