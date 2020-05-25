@@ -19,7 +19,7 @@ export default class CommentModel {
     return new CommentModel(comment);
   }
 
-  static parseComments(comment) {
-    return comment.map(CommentModel.parseComment);
+  static parseComments(comments) {
+    return comments.map(CommentModel.parseComment);
   }
 }

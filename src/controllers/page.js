@@ -158,6 +158,7 @@ export default class PageController {
   }
 
   _onFilterChange() {
+    this._sort.setDefaultSortType();
     this._updateFilms();
   }
 
@@ -167,7 +168,6 @@ export default class PageController {
       this._hide();
       this._statisticComponent.show();
     } else {
-      this._sort.setDefaultSortType();
       this._removeFilms();
       this._films = this._moviesModel.getFilms();
       const showingFilmsCount = resetShowingFilmsCount ? FILM_PAGE_COUNT : this._showingFilmsCount;
