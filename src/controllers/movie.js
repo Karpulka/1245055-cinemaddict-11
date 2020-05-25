@@ -45,6 +45,7 @@ export default class MovieController {
     this._onSubmitForm = this._onSubmitForm.bind(this);
     this._onChangeFormFilterInput = this._onChangeFormFilterInput.bind(this);
     this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
+    this._updatedFilm = null;
   }
 
   get film() {
@@ -53,6 +54,7 @@ export default class MovieController {
 
   render(film) {
     this._film = film;
+    this._updatedFilm = Object.assign({}, film);
 
     const oldFilmComponent = this._filmComponent;
     const oldFilmDetailsComponent = this._filmDetailsComponent;
@@ -87,23 +89,38 @@ export default class MovieController {
   }
 
   _setAddToWatchlist() {
-    this._onDataChange(this._film, Object.assign({}, this._film, {
-      isWatchlist: !this._film.isWatchlist
-    }));
+    this._addToWatchlist();
+    this._onDataChange(this._film, this._updatedFilm);
   }
 
   _setMarkAsWatched() {
-    const watchingDate = this._film.isWatched ? null : new Date();
-    this._onDataChange(this._film, Object.assign({}, this._film, {
-      isWatched: !this._film.isWatched,
-      watchingDate
-    }));
+    this._markAsWatched();
+    this._onDataChange(this._film, this._updatedFilm);
   }
 
   _setMarkAsFavorite() {
-    this._onDataChange(this._film, Object.assign({}, this._film, {
-      isFavorites: !this._film.isFavorites
-    }));
+    this._markAsFavorite();
+    this._onDataChange(this._film, this._updatedFilm);
+  }
+
+  _addToWatchlist() {
+    this._updatedFilm = Object.assign({}, this._updatedFilm, {
+      isWatchlist: !this._film.isWatchlist
+    });
+  }
+
+  _markAsWatched() {
+    const watchingDate = this._updatedFilm.isWatched ? null : new Date();
+    this._updatedFilm = Object.assign({}, this._updatedFilm, {
+      isWatched: !this._updatedFilm.isWatched,
+      watchingDate
+    });
+  }
+
+  _markAsFavorite() {
+    this._updatedFilm = Object.assign({}, this._updatedFilm, {
+      isFavorites: !this._updatedFilm.isFavorites
+    });
   }
 
   _setMovieHandlers() {
@@ -145,22 +162,26 @@ export default class MovieController {
   _onChangeFormFilterInput(evt) {
     switch (evt.target.name) {
       case FormFilterTypes.WATCHLIST:
-        this._setAddToWatchlist();
+        this._addToWatchlist();
         break;
       case FormFilterTypes.WATCHED:
-        this._setMarkAsWatched();
+        this._markAsWatched();
         break;
       case FormFilterTypes.FAVORITE:
-        this._setMarkAsFavorite();
+        this._markAsFavorite();
         break;
     }
   }
 
   _closeFilmDetails() {
-    this._filmDetailsComponent.reset();
-    toggleElement(this._footerElement, this._filmDetailsComponent, `hide`);
-    document.removeEventListener(`keydown`, this._onEscapeKeyPress);
-    this._mode = Mode.DEFAULT;
+    if (this._film !== this._updatedFilm) {
+      this._onDataChange(this._film, this._updatedFilm);
+    } else {
+      this._filmDetailsComponent.reset();
+      toggleElement(this._footerElement, this._filmDetailsComponent, `hide`);
+      document.removeEventListener(`keydown`, this._onEscapeKeyPress);
+      this._mode = Mode.DEFAULT;
+    }
   }
 
   _onFilmElementClick() {
