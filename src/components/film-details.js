@@ -195,21 +195,30 @@ export default class FilmDetails extends AbstractSmartComponent {
     return createFilmDetailsTemplate(this._film, options);
   }
 
-  addDeleteCommentID(id) {
+  addDeleteCommentID(id, film) {
     this._deletingComments.push(id);
     this._setCommentInfo();
+    this._setCheckedFiltres(film);
 
     this.rerender();
   }
 
-  removeDeleteCommentID(id) {
+  removeDeleteCommentID(id, film) {
     const index = this._deletingComments.indexOf(id);
     if (index > -1) {
       this._deletingComments.splice(index, 1);
       this._setCommentInfo();
+      this._setCheckedFiltres(film);
 
       this.rerender();
     }
+  }
+
+  _setCheckedFiltres(film) {
+    this._film.isWatched = film.isWatched;
+    this._film.watchingDate = film.watchingDate;
+    this._film.isWatchlist = film.isWatchlist;
+    this._film.isFavorites = film.isFavorites;
   }
 
   _setCommentInfo() {
@@ -218,7 +227,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     const commentEmojiValue = this.getElement().querySelectorAll(`[name="comment-emoji"]:checked`);
     this._newCommentText = commentTextElement ? commentTextElement.value : null;
     this._newCommentEmoji = emojiElement ? emojiElement.outerHTML : null;
-    this._newCommentEmojiValue = commentEmojiValue ? commentEmojiValue[0].value : null;
+    this._newCommentEmojiValue = commentEmojiValue && commentEmojiValue[0] ? commentEmojiValue[0].value : null;
   }
 
   rerender() {

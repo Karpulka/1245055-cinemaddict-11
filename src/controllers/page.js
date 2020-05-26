@@ -118,22 +118,14 @@ export default class PageController {
     });
   }
 
-  _onDataChange(oldFilm, newFilm) {
-    if (newFilm) {
-      this._api.updateFilm(oldFilm.id, new FilmModel(parseFilmForUpdate(newFilm)))
-        .then((filmModel) => {
-          this._updateFilmsAfterRequests(filmModel);
-        });
-    } else {
-      this._api.getFilms()
-        .then((filmModels) => {
-          const filmModel = filmModels.find((film) => film.id === oldFilm.id);
-          this._updateFilmsAfterRequests(filmModel, true);
-        });
-    }
+  _onDataChange(oldFilm, newFilm, rerenderFilmsList = false) {
+    this._api.updateFilm(oldFilm.id, new FilmModel(parseFilmForUpdate(newFilm)))
+      .then((filmModel) => {
+        this._updateFilmsAfterRequests(filmModel, rerenderFilmsList);
+      });
   }
 
-  _updateFilmsAfterRequests(film, isCommentDelete = false) {
+  _updateFilmsAfterRequests(film, rerenderFilmsList) {
     this._moviesModel.updateData(film.id, film);
 
     const filmControllers = this._showingFilms.filter((filmController) => filmController.film.id === film.id);
@@ -142,10 +134,10 @@ export default class PageController {
     this._profileComponent.rerender();
     this._filtersController.render();
     this._statisticComponent.rerender();
-    if (!isCommentDelete) {
+    this._statisticComponent.hide();
+    if (rerenderFilmsList) {
       this._updateFilms(false);
     }
-    this._statisticComponent.hide();
   }
 
   _onAdditionBlockChange() {

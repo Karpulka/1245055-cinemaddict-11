@@ -46,6 +46,7 @@ export default class MovieController {
     this._onChangeFormFilterInput = this._onChangeFormFilterInput.bind(this);
     this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
     this._updatedFilm = null;
+    this._isUpdatedFilm = false;
   }
 
   get film() {
@@ -90,23 +91,24 @@ export default class MovieController {
 
   _setAddToWatchlist() {
     this._addToWatchlist();
-    this._onDataChange(this._film, this._updatedFilm);
+    this._onDataChange(this._film, this._updatedFilm, true);
   }
 
   _setMarkAsWatched() {
     this._markAsWatched();
-    this._onDataChange(this._film, this._updatedFilm);
+    this._onDataChange(this._film, this._updatedFilm, true);
   }
 
   _setMarkAsFavorite() {
     this._markAsFavorite();
-    this._onDataChange(this._film, this._updatedFilm);
+    this._onDataChange(this._film, this._updatedFilm, true);
   }
 
   _addToWatchlist() {
     this._updatedFilm = Object.assign({}, this._updatedFilm, {
       isWatchlist: !this._film.isWatchlist
     });
+    this._isUpdatedFilm = true;
   }
 
   _markAsWatched() {
@@ -115,12 +117,14 @@ export default class MovieController {
       isWatched: !this._updatedFilm.isWatched,
       watchingDate
     });
+    this._isUpdatedFilm = true;
   }
 
   _markAsFavorite() {
     this._updatedFilm = Object.assign({}, this._updatedFilm, {
       isFavorites: !this._updatedFilm.isFavorites
     });
+    this._isUpdatedFilm = true;
   }
 
   _setMovieHandlers() {
@@ -151,7 +155,8 @@ export default class MovieController {
         .then((comments) => {
           const addedComment = comments.filter((comment) => this._film.comments.indexOf(comment.id) === -1);
           this._filmCommentsModel.addComment(addedComment);
-          this._onDataChange(this._film, null);
+          this._onDataChange(this._film, this._updatedFilm);
+          this._isUpdatedFilm = false;
         })
         .catch(() => {
           this._filmDetailsComponent.activateForm();
@@ -175,14 +180,16 @@ export default class MovieController {
   }
 
   _closeFilmDetails() {
-    if (this._film !== this._updatedFilm) {
-      this._onDataChange(this._film, this._updatedFilm);
-    } else {
-      this._filmDetailsComponent.reset();
-      toggleElement(this._footerElement, this._filmDetailsComponent, `hide`);
-      document.removeEventListener(`keydown`, this._onEscapeKeyPress);
-      this._mode = Mode.DEFAULT;
+    if (this._isUpdatedFilm) {
+      this._onDataChange(this._film, this._updatedFilm, true);
     }
+
+    this._filmDetailsComponent.reset();
+    toggleElement(this._footerElement, this._filmDetailsComponent, `hide`);
+    document.removeEventListener(`keydown`, this._onEscapeKeyPress);
+    this._mode = Mode.DEFAULT;
+
+    this._isUpdatedFilm = false;
   }
 
   _onFilmElementClick() {
@@ -211,17 +218,14 @@ export default class MovieController {
     evt.preventDefault();
 
     const id = evt.target.getAttribute(`data-id`);
-    this._filmDetailsComponent.addDeleteCommentID(id);
+    this._filmDetailsComponent.addDeleteCommentID(id, this._updatedFilm);
     this._filmDetailsComponent.removeDeleteCommentErrorStyles(id);
 
     this._api.deleteComment(id)
       .then(() => {
         this._filmCommentsModel.deleteComment(id);
-        const index = this._updatedFilm.comments.indexOf(id);
-        if (index > -1) {
-          this._updatedFilm.comments.splice(index, 1);
-        }
-        this._filmDetailsComponent.removeDeleteCommentID(id);
+        this._filmDetailsComponent.removeDeleteCommentID(id, this._updatedFilm);
+        this._isUpdatedFilm = true;
         document.addEventListener(`keydown`, this._onEscapeKeyPress);
       })
       .catch(() => {
